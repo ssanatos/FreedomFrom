@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로부터의 자유</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+            background-color: #0f172a;
+        }
+
+        .font-title {
+            font-family: 'Black Han Sans', sans-serif;
+        }
+
+        /* Water Animation Effects */
+        .tsunami-water {
+            background: linear-gradient(180deg, rgba(14, 165, 233, 0.55) 0%, rgba(3, 105, 161, 0.68) 70%, rgba(12, 74, 110, 0.80) 100%);
+            backdrop-filter: blur(1.5px) saturate(1.15);
+            box-shadow: 0 -10px 30px rgba(56, 189, 248, 0.5);
+        }
+
+        .wave-top {
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 C150,90 350,-40 500,40 C650,120 900,20 1200,60 L1200,120 L0,120 Z' fill='%230ea5e9' opacity='0.8'%3E%3C/path%3E%3C/svg%3E");
+            background-size: 1200px 100%;
+            animation: waveAnim 3s linear infinite;
+        }
+
+        @keyframes waveAnim {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1200px; }
+        }
+
+        /* Screen Shake Effect */
+        .shake {
+            animation: shakeAnim 0.15s cubic-bezier(.36,.07,.19,.97) infinite;
+        }
+        @keyframes shakeAnim {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-4px, 3px) rotate(-1deg); }
+            50% { transform: translate(4px, -3px) rotate(1deg); }
+            75% { transform: translate(-3px, -2px) rotate(0deg); }
+        }
+
+        /* Custom UI Glow & Animations */
+        .btn-action {
+            transition: all 0.05s ease;
+            touch-action: manipulation;
+        }
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+
+        .key-item {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .key-item:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+
+        /* ===== Stage 1: Bird cage scene ===== */
+        .cage-scene { position: relative; width: 210px; height: 250px; perspective: 900px; filter: drop-shadow(0 14px 18px rgba(0,0,0,.5)); }
+        .cage-hook { position: absolute; left: 50%; top: -16px; width: 30px; height: 30px; margin-left: -15px; border: 4px solid #fbbf24; border-radius: 50%; border-bottom-color: transparent; }
+        .cage-glow { position: absolute; left: 50%; top: 52%; width: 280px; height: 280px; margin: -140px 0 0 -140px; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,.65) 0%, rgba(251,191,36,.25) 40%, transparent 70%); opacity: 0; transform: scale(.4); transition: opacity .6s ease, transform .8s ease; pointer-events: none; }
+        .cage-glow.on { opacity: 1; transform: scale(1.1); }
+        .cage-shell { position: absolute; inset: 12px 0 22px 0; border: 4px solid #b7791f; border-radius: 105px 105px 14px 14px; background: linear-gradient(180deg, rgba(251,191,36,.10), rgba(15,23,42,.55)); overflow: hidden; z-index: 1; }
+        .cage-bars { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 20px, rgba(217,160,40,.8) 20px 23px); }
+        .cage-bars::after { content: ""; position: absolute; left: 0; right: 0; top: 60px; height: 3px; background: rgba(217,160,40,.8); }
+        .cage-base { position: absolute; left: -8px; right: -8px; bottom: 0; height: 26px; z-index: 6; border-radius: 8px 8px 14px 14px; background: linear-gradient(#a16207, #5b2a0c); border: 2px solid #fbbf24; box-shadow: inset 0 2px 0 rgba(255,255,255,.25); }
+        .cage-door { position: absolute; left: 55px; top: 78px; width: 100px; bottom: 30px; z-index: 4; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.34,1.45,.5,1); border: 4px solid #fbbf24; border-radius: 50px 50px 4px 4px; background: repeating-linear-gradient(90deg, rgba(15,23,42,.25) 0 14px, rgba(251,191,36,.9) 14px 17px); box-shadow: inset 0 0 14px rgba(0,0,0,.5), 0 0 12px rgba(251,191,36,.35); }
+        .cage-door.open { transform: rotateY(-118deg); }
+        .cage-door::before { content: ""; position: absolute; left: -6px; top: 18%; width: 8px; height: 14px; background: #92400e; border-radius: 2px; box-shadow: 0 90px 0 #92400e; }
+        .cage-lock { position: absolute; right: -22px; top: 46%; width: 38px; height: 46px; z-index: 8; background: none; border: 0; padding: 0; cursor: pointer; animation: lockPulse 1.1s ease-in-out infinite; }
+        .cage-lock svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
+        .cage-lock .shackle { transition: transform .3s cubic-bezier(.3,1.6,.5,1); transform-origin: 27px 20px; }
+        .cage-lock.unlocked { animation: none; }
+        .cage-lock.unlocked .shackle { transform: translateY(-7px) rotate(-35deg); }
+        .cage-lock.drop { animation: lockDrop .7s ease-in forwards; }
+        @keyframes lockPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(253,224,71,0)); } 50% { transform: scale(1.14); filter: drop-shadow(0 0 10px rgba(253,224,71,.95)); } }
+        @keyframes lockDrop { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(90px) rotate(55deg); opacity: 0; } }
+        .bird-wrap { position: absolute; left: 50%; bottom: 40px; width: 74px; height: 74px; margin-left: -37px; z-index: 3; }
+        .bird-wrap.escaping { z-index: 9; animation: birdEscape 1.7s cubic-bezier(.3,.1,.4,1) forwards; }
+        .bird-wrap svg { width: 100%; height: 100%; overflow: visible; animation: birdIdle 1.6s ease-in-out infinite; }
+        .bird-wrap svg.panic { animation: birdPanic .12s linear infinite; }
+        .bird-wrap .wing { transform-origin: 34px 46px; animation: wingIdle 1.6s ease-in-out infinite; }
+        .bird-wrap svg.panic .wing { animation: wingFlap .14s ease-in-out infinite alternate; }
+        .bird-wrap.escaping svg { animation: none; }
+        .bird-wrap.escaping .wing { animation: wingFlap .13s ease-in-out infinite alternate; }
+        @keyframes birdIdle { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(-3deg); } }
+        @keyframes birdPanic { 0% { transform: translate(-2px, 0) rotate(-4deg); } 50% { transform: translate(2px, -2px) rotate(4deg); } 100% { transform: translate(-2px, 0) rotate(-4deg); } }
+        @keyframes wingIdle { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-8deg); } }
+        @keyframes wingFlap { from { transform: rotate(-40deg); } to { transform: rotate(25deg); } }
+        @keyframes birdEscape {
+            0%   { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; }
+            22%  { transform: translate(34px, -14px) scale(1.12) rotate(-6deg); opacity: 1; }
+            100% { transform: translate(190px, -300px) scale(1.7) rotate(-24deg); opacity: 0; }
+        }
+        .cage-spark { position: absolute; left: 50%; top: 55%; width: 9px; height: 9px; z-index: 10; pointer-events: none; border-radius: 50%; background: #fde047; box-shadow: 0 0 8px 2px rgba(253,224,71,.9); }
+        .cage-feather { position: absolute; left: 50%; top: 55%; width: 8px; height: 18px; z-index: 10; pointer-events: none; border-radius: 50%; background: #fde68a; }
+
+
+        /* ===== Shared graphics: tools & effects (stages 2-8) ===== */
+        .jawA { transform-origin: 0 0; transform: rotate(-16deg); }
+        .jawB { transform-origin: 0 0; transform: rotate(16deg); }
+        .snip .jawA { animation: jawA .17s; } .snip .jawB { animation: jawB .17s; }
+        @keyframes jawA { 50% { transform: rotate(0deg); } } @keyframes jawB { 50% { transform: rotate(0deg); } }
+        .fb { transform-box: fill-box; transform-origin: center; }
+        .sawing { animation: sawMove .14s; }
+        @keyframes sawMove { 50% { transform: translateX(-16px); } }
+        .dog.run { animation: dogRun 1.7s ease-in forwards; }
+        @keyframes dogRun { 0% { transform: translate(0,0) scaleX(1); } 10% { transform: translate(0,-12px) scaleX(-1); } 30% { transform: translate(60px,-14px) scaleX(-1); } 45% { transform: translate(100px,0) scaleX(-1); } 60% { transform: translate(145px,-14px) scaleX(-1); } 75% { transform: translate(190px,0) scaleX(-1); } 100% { transform: translate(280px,0) scaleX(-1); } }
+        .tail { transform-origin: 28px -8px; animation: wag .35s ease-in-out infinite alternate; }
+        @keyframes wag { from { transform: rotate(-14deg); } to { transform: rotate(18deg); } }
+        .free .chain, .free .cuffL, .free .cuffR { transition: transform .8s ease-in, opacity .8s; opacity: 0; }
+        .free .chain { transform: translateY(46px) rotate(10deg); }
+        .free .cuffL { transform: translate(-14px, 24px) rotate(-60deg); }
+        .free .cuffR { transform: translate(14px, 24px) rotate(60deg); }
+        .cheer { animation: cheerHop .5s ease-in-out 3; }
+        @keyframes cheerHop { 50% { transform: translateY(-14px); } }
+        .fallT { animation: fallT .8s ease-in forwards; } .fallB { animation: fallB .8s ease-in forwards; }
+        @keyframes fallT { to { transform: translate(-16px, 120px) rotate(40deg); opacity: 0; } }
+        @keyframes fallB { to { transform: translate(18px, 90px) rotate(-50deg); opacity: 0; } }
+        .prisOut { animation: prisOut 1.1s ease-in .3s forwards; transform-origin: 200px 130px; }
+        @keyframes prisOut { to { transform: scale(1.8) translateY(36px); opacity: 0; } }
+        .soldRun { animation: soldRun 1.5s ease-in forwards; }
+        @keyframes soldRun { 0% { transform: translate(0,0); } 20% { transform: translate(40px,-8px); } 40% { transform: translate(90px,0); } 60% { transform: translate(150px,-8px); } 80% { transform: translate(210px,0); } 100% { transform: translate(300px,0); opacity: 0; } }
+        .mudflow { stroke-dasharray: 14 10; animation: mudflow .8s linear infinite; }
+        @keyframes mudflow { to { stroke-dashoffset: -24; } }
+        .swing .pickL, .swing .pickR { animation: pk .15s; }
+        @keyframes pk { 50% { transform: translateY(-7px); } }
+        .chain8.glow { stroke: #fbbf24; filter: drop-shadow(0 0 4px #fbbf24); }
+        .chain8.shatter { animation: chainBreak .9s ease-out forwards; }
+        @keyframes chainBreak { to { transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); opacity: 0; } }
+
+
+        /* ===== New stages (9-17) effects ===== */
+        .ham { transform-origin: 0 0; }
+        .hamHit { animation: hamHit .14s; }
+        @keyframes hamHit { 50% { transform: rotate(-30deg); } }
+        .iceOut { animation: iceOut .6s forwards; }
+        @keyframes iceOut { to { transform: scale(1.3); opacity: 0; } }
+        .carOut { animation: carOut 1s ease-in forwards; }
+        @keyframes carOut { to { transform: translate(70px,-50px) scale(.6); opacity: 0; } }
+        .dolJump { animation: dolJump 1.3s ease-in forwards; }
+        @keyframes dolJump { 50% { transform: translate(90px,-70px) rotate(-22deg); } 100% { transform: translate(200px,40px) rotate(18deg); opacity: 0; } }
+        .boatGo { animation: boatGo 2s ease-in forwards; }
+        @keyframes boatGo { to { transform: translate(280px,-8px); } }
+        .pullCord { animation: pullCord .12s; }
+        @keyframes pullCord { 50% { transform: translate(-12px,10px); } }
+        .wig { animation: wig .12s; transform-origin: 0 0; }
+        @keyframes wig { 50% { transform: rotate(-6deg); } }
+
+        /* Canvas Overlay */
+        #gameCanvas {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between items-center relative text-white bg-slate-900">
+
+    <!-- Background Dynamic Canvas -->
+    <canvas id="gameCanvas" class="absolute inset-0 w-full h-full z-0"></canvas>
+
+    <!-- Rising Tsunami Overlay Container -->
+    <div id="tsunamiContainer" class="absolute bottom-0 left-0 w-full z-30 pointer-events-none h-0 flex flex-col justify-start">
+        <div class="wave-top w-full h-12 -mt-10"></div>
+        <div class="tsunami-water w-full flex-1"></div>
+    </div>
+
+    <!-- Top UI / Header -->
+    <header class="z-20 w-full max-w-4xl p-4 flex justify-between items-center bg-slate-900/80 backdrop-blur-md rounded-b-2xl border-b border-slate-700/50 shadow-lg">
+        <div>
+            <span class="text-xs text-sky-400 font-bold uppercase tracking-wider block">STAGE <span id="stageNum">1</span> / 17</span>
+            <h1 id="stageTitle" class="text-xl md:text-2xl font-title text-white tracking-wide">새장의 문을 열어라!</h1>
+        </div>
+        
+        <!-- Timer & Water Level Indicator -->
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <span class="text-xs text-slate-400 block">남은 시간</span>
+                <span id="timerText" class="text-2xl md:text-3xl font-mono font-bold text-amber-400">15.0s</span>
+            </div>
+            <button id="soundToggle" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 transition-colors">
+                <i id="soundIcon" class="fas fa-volume-up"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Center Interactive Play Area -->
+    <main id="playArea" class="z-20 flex-1 w-full max-w-3xl flex flex-col items-center justify-center p-4 relative">
+        
+        <!-- Stage Objective / Prompt -->
+        <div id="stagePrompt" class="bg-slate-800/90 border border-slate-700 backdrop-blur px-6 py-2 rounded-full mb-4 shadow-md text-center max-w-md">
+            <p id="stageDesc" class="text-sm md:text-base font-medium text-sky-200">쓰나미가 덮치기 전에 새장 자물쇠를 클릭해 문을 열어주세요!</p>
+        </div>
+
+        <!-- Action Progress Container -->
+        <div id="progressContainer" class="w-full max-w-md mb-6 hidden">
+            <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
+                <span id="progressLabel">진행도</span>
+                <span id="progressValue">0%</span>
+            </div>
+            <div class="w-full h-5 bg-slate-800/90 rounded-full border border-slate-700 p-0.5 shadow-inner overflow-hidden">
+                <div id="progressBar" class="h-full bg-gradient-to-r from-sky-500 to-emerald-400 rounded-full w-0 transition-all duration-75"></div>
+            </div>
+        </div>
+
+        <!-- Dynamic Game Stage View Container -->
+        <div id="stageContainer" class="relative w-full max-w-xl h-80 md:h-96 bg-slate-800/40 rounded-3xl border border-slate-700/60 shadow-2xl overflow-hidden flex flex-col items-center justify-center p-6">
+            <!-- Stage Visual & Controls will be dynamically rendered here -->
+        </div>
+
+    </main>
+
+    <!-- Footer Controls & Hints -->
+    <footer class="z-20 w-full max-w-4xl p-3 text-center text-xs text-slate-400 bg-slate-900/60 backdrop-blur-sm border-t border-slate-800/50">
+        <span id="keyHint" class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 text-slate-300">💡 마우스 클릭 또는 화면 터치로 구속을 해제하세요!</span>
+    </footer>
+
+    <!-- Overlay Modals (Start, Game Over, Victory) -->
+    
+    <!-- Start Game Modal -->
+    <div id="startModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl">
+            <div class="w-20 h-20 bg-sky-500/10 border border-sky-500/30 text-sky-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 animate-bounce">
+                <i class="fas fa-water"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-title text-white mb-2">로부터의 자유</h1>
+            <p class="text-slate-300 text-sm md:text-base mb-6 leading-relaxed">
+                거대한 쓰나미가 몰려옵니다!<br>
+                묶이고, 갇히고, 빠진 캐릭터들의 구속을 빠르게 해제하여 무사히 탈출시키세요!
+            </p>
+            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/70 text-left text-xs text-slate-300 mb-6 space-y-2">
+                <div class="flex items-center gap-2"><i class="fas fa-bolt text-amber-400"></i><span>빠른 연타, 키 찾기, 미끄럼 탈출 등 다양한 미션</span></div>
+                <div class="flex items-center gap-2"><i class="fas fa-clock text-sky-400"></i><span>물이 차오르기 전에 해결하지 못하면 게임 오버!</span></div>
+            </div>
+            <button id="startBtn" class="w-full py-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-title text-xl rounded-2xl shadow-lg shadow-sky-500/30 btn-action">
+                게임 시작하기
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-red-500/40 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl">
+            <div class="w-20 h-20 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                <i class="fas fa-skull-crossbones"></i>
+            </div>
+            <h2 class="text-3xl font-title text-red-400 mb-2">쓰나미에 삼켜졌습니다!</h2>
+            <p id="gameOverReason" class="text-slate-300 text-sm mb-6">물이 너무 빨리 차올라 탈출에 실패했습니다.</p>
+            
+            <div class="flex gap-4">
+                <button id="retryStageBtn" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold rounded-xl btn-action">
+                    현재 스테이지 재시도
+                </button>
+                <button id="restartGameBtn" class="flex-1 py-3.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-bold rounded-xl btn-action">
+                    처음부터 다시
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage Victory Modal -->
+    <div id="victoryModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
+            <div class="w-20 h-20 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 animate-pulse">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="text-3xl font-title text-emerald-400 mb-2">탈출 성공!</h2>
+            <p id="victoryMessage" class="text-slate-300 text-sm mb-6">무사히 쓰나미를 덮치기 전에 구출했습니다!</p>
+            <button id="nextStageBtn" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title text-lg rounded-xl shadow-lg shadow-emerald-500/30 btn-action">
+                다음 스테이지로
+            </button>
+        </div>
+    </div>
+
+    <!-- Final Game Clear Modal -->
+    <div id="clearModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-amber-500/50 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl">
+            <div class="w-24 h-24 bg-amber-500/10 border border-amber-500/40 text-amber-400 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 animate-bounce">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-title text-amber-400 mb-2">전설의 탈출 전문가!</h2>
+            <p class="text-slate-200 text-sm md:text-base mb-6">
+                모든 17개 위기 상황에서 대상을 무사히 구출해냈습니다!<br>
+                당신의 신속한 판단력과 민첩성이 생명을 구했습니다.
+            </p>
+            <button id="finalRestartBtn" class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-title text-xl rounded-2xl shadow-lg shadow-amber-500/30 btn-action">
+                다시 도전하기
+            </button>
+        </div>
+    </div>
+
+    <!-- Web Audio API Sound Synthesizer & Game Script -->
+    <script>
+        /* ==========================================================================
+           1. AUDIO SYNTHESIZER (Web Audio API - Self-Contained Sound FX)
+           ========================================================================== */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+            }
+
+            playClick() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playCut() {
+                if (!this.enabled || !this.ctx) return;
+                const bufferSize = this.ctx.sampleRate * 0.08;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1200;
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start();
+            }
+
+            playMetalSaw() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800 + Math.random() * 300, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(400, this.ctx.currentTime + 0.06);
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.06);
+            }
+
+            playSuccess() {
+                if (!this.enabled || !this.ctx) return;
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.08);
+                    osc.stop(this.ctx.currentTime + idx * 0.08 + 0.3);
+                });
+            }
+
+            playFail() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.4);
+            }
+
+            playSplash() {
+                if (!this.enabled || !this.ctx) return;
+                const bufferSize = this.ctx.sampleRate * 0.3;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+                }
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 400;
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start();
+            }
+        }
+
+        const sfx = new SoundFX();
+
+        /* ==========================================================================
+           2. GAME ENGINE & STATE MANAGEMENT
+           ========================================================================== */
+        const game = {
+            currentStage: 1,
+            totalStages: 17,
+            timer: 0,
+            maxTimer: 15,
+            timerId: null,
+            animFrameId: null,
+            isRunning: false,
+            stageProgress: 0,
+            stageTarget: 100,
+
+            // Stage Specific States
+            stageData: {},
+
+            // Stages Configuration Definition
+            stages: [
+                { id: 1, setup: 1, title: "새장으로부터의 자유", desc: "쓰나미가 몰려옵니다! 자물쇠를 클릭하여 새장 문을 열어주세요.", duration: 12 },
+                { id: 2, setup: 2, title: "목줄로부터의 자유", desc: "가위로 강아지 목줄을 10번 클릭하여 끊으세요!", duration: 14 },
+                { id: 3, setup: 3, title: "수갑으로부터의 자유", desc: "30개의 열쇠 중 수갑을 풀 수 있는 진짜 열쇠를 찾으세요!", duration: 18 },
+                { id: 4, setup: 4, title: "감옥으로부터의 자유", desc: "톱으로 감옥 쇠창살을 빠르게 40번 썰어 파괴하세요! (클릭/연타)", duration: 16 },
+                { id: 5, setup: 5, title: "군대로부터의 자유", desc: "절단기질 50번을 수행해 군부대 철망 울타리를 끊으세요! (스페이스바 가능)", duration: 18 },
+                { id: 6, setup: 7, title: "잠수함 해치로부터의 자유", desc: "녹슨 밸브를 시계방향으로 연속 클릭하여 20바퀴 회전시키세요!", duration: 16 },
+                { id: 7, setup: 8, title: "사슬로부터의 자유", desc: "자물쇠 암호 3자리를 맞추고 사슬을 파쇄하세요!", duration: 20 },
+                { id: 8, setup: 9, title: "얼음으로부터의 자유", desc: "망치로 얼음을 60번 내리쳐 깨뜨리세요!", duration: 16 },
+                { id: 9, setup: 10, title: "밧줄로부터의 자유", desc: "표시된 색의 매듭을 찾아 2번씩 눌러 풀어주세요!", duration: 18 },
+                { id: 10, setup: 11, title: "바위로부터의 자유", desc: "받침돌 위치를 고르고 지렛대를 눌러 바위를 들어올리세요!", duration: 20 },
+                { id: 11, setup: 12, title: "늪으로부터의 자유", desc: "구명줄이 초록 구간에 올 때 타이밍 맞춰 잡으세요!", duration: 20 },
+                { id: 12, setup: 13, title: "자동차로부터의 자유", desc: "안전벨트를 자르고 창문을 깨서 탈출하세요!", duration: 20 },
+                { id: 13, setup: 14, title: "그물로부터의 자유", desc: "빨갛게 팽팽한 그물 줄만 골라서 자르세요!", duration: 18 },
+                { id: 14, setup: 15, title: "자물쇠로부터의 자유", desc: "핀이 초록 구간에 올 때 클릭해서 자물쇠를 따세요!", duration: 18 },
+                { id: 15, setup: 16, title: "닻줄로부터의 자유", desc: "닻줄을 풀고 시동 줄을 당겨 바다로 출항하세요!", duration: 22 },
+                { id: 16, setup: 17, title: "잠긴 문으로부터의 자유", desc: "드라이버로 경첩 나사 4개를 풀어 문을 떼어내세요!", duration: 20 },
+                { id: 17, setup: 6, title: "중력으로부터의 자유", desc: "구덩이 양쪽 벽을 번갈아 차며 지그재그로 점프하세요! 멈추면 중력에 끌려 떨어집니다!", duration: 16 }
+            ]
+        };
+
+        // DOM Elements Elements
+        const elements = {
+            gameCanvas: document.getElementById('gameCanvas'),
+            tsunamiContainer: document.getElementById('tsunamiContainer'),
+            stageNum: document.getElementById('stageNum'),
+            stageTitle: document.getElementById('stageTitle'),
+            stageDesc: document.getElementById('stageDesc'),
+            timerText: document.getElementById('timerText'),
+            soundToggle: document.getElementById('soundToggle'),
+            soundIcon: document.getElementById('soundIcon'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressBar: document.getElementById('progressBar'),
+            progressLabel: document.getElementById('progressLabel'),
+            progressValue: document.getElementById('progressValue'),
+            stageContainer: document.getElementById('stageContainer'),
+            keyHint: document.getElementById('keyHint'),
+            victoryMessage: document.getElementById('victoryMessage'),
+            gameOverReason: document.getElementById('gameOverReason'),
+            // Modals
+            startModal: document.getElementById('startModal'),
+            gameOverModal: document.getElementById('gameOverModal'),
+            victoryModal: document.getElementById('victoryModal'),
+            clearModal: document.getElementById('clearModal'),
+            // Buttons
+            startBtn: document.getElementById('startBtn'),
+            retryStageBtn: document.getElementById('retryStageBtn'),
+            restartGameBtn: document.getElementById('restartGameBtn'),
+            nextStageBtn: document.getElementById('nextStageBtn'),
+            finalRestartBtn: document.getElementById('finalRestartBtn')
+        };
+
+        /* ==========================================================================
+           3. CANVAS PARTICLES & TSUNAMI BACKGROUND ANIMATION
+           ========================================================================== */
+        const ctx = elements.gameCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            elements.gameCanvas.width = window.innerWidth;
+            elements.gameCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class RainParticle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * elements.gameCanvas.width;
+                this.y = Math.random() * -100;
+                this.vy = Math.random() * 15 + 10;
+                this.vx = (Math.random() - 0.5) * 4 - 3;
+                this.length = Math.random() * 25 + 10;
+                this.alpha = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.y += this.vy;
+                this.x += this.vx;
+                if (this.y > elements.gameCanvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.vx, this.y + this.length);
+                ctx.strokeStyle = `rgba(186, 230, 253, ${this.alpha})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+        }
+
+        for (let i = 0; i < 70; i++) {
+            particles.push(new RainParticle());
+        }
+
+        function renderBackground() {
+            ctx.clearRect(0, 0, elements.gameCanvas.width, elements.gameCanvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(renderBackground);
+        }
+        renderBackground();
+
+        /* ==========================================================================
+           4. GAME CORE CONTROLLER & STAGE SETUP
+           ========================================================================== */
+        function initGameEvents() {
+            elements.soundToggle.addEventListener('click', () => {
+                sfx.init();
+                sfx.enabled = !sfx.enabled;
+                elements.soundIcon.className = sfx.enabled ? "fas fa-volume-up" : "fas fa-volume-mute text-slate-500";
+            });
+
+            elements.startBtn.addEventListener('click', () => {
+                sfx.init();
+                elements.startModal.classList.add('hidden');
+                loadStage(1);
+            });
+
+            elements.retryStageBtn.addEventListener('click', () => {
+                elements.gameOverModal.classList.add('hidden');
+                loadStage(game.currentStage);
+            });
+
+            elements.restartGameBtn.addEventListener('click', () => {
+                elements.gameOverModal.classList.add('hidden');
+                loadStage(1);
+            });
+
+            elements.nextStageBtn.addEventListener('click', () => {
+                elements.victoryModal.classList.add('hidden');
+                loadStage(game.currentStage + 1);
+            });
+
+            elements.finalRestartBtn.addEventListener('click', () => {
+                elements.clearModal.classList.add('hidden');
+                loadStage(1);
+            });
+
+            // Global Keydown Support (Spacebar for mashing stages)
+            window.addEventListener('keydown', (e) => {
+                if (!game.isRunning) return;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    triggerKeyboardMash();
+                }
+            });
+        }
+
+        function loadStage(stageNum) {
+            game.currentStage = stageNum;
+            const config = game.stages[stageNum - 1];
+
+            // UI Update
+            elements.stageNum.textContent = config.id;
+            elements.stageTitle.textContent = config.title;
+            elements.stageDesc.textContent = config.desc;
+            
+            // Timer & Water Reset
+            game.maxTimer = config.duration;
+            game.timer = config.duration;
+            elements.timerText.textContent = game.timer.toFixed(1) + "s";
+            elements.tsunamiContainer.style.transition = 'none';
+            elements.tsunamiContainer.style.height = '0px';
+
+            // Progress Bar Reset
+            game.stageProgress = 0;
+            elements.progressContainer.classList.add('hidden');
+            updateProgressBar(0);
+
+            // Clear Stage Visual Container
+            elements.stageContainer.innerHTML = '';
+            elements.stageContainer.className = "relative w-full max-w-xl h-80 md:h-96 bg-slate-800/50 rounded-3xl border border-slate-700/60 shadow-2xl overflow-hidden flex flex-col items-center justify-center p-6";
+
+            // Render Specific Stage UI
+            game.tick = null;
+            switch(config.setup) {
+                case 1: setupStage1(); break;
+                case 2: setupStage2(); break;
+                case 3: setupStage3(); break;
+                case 4: setupStage4(); break;
+                case 5: setupStage5(); break;
+                case 6: setupStage6(); break;
+                case 7: setupStage7(); break;
+                case 8: setupStage8(); break;
+                case 9: setupStage9(); break;
+                case 10: setupStage10(); break;
+                case 11: setupStage11(); break;
+                case 12: setupStage12(); break;
+                case 13: setupStage13(); break;
+                case 14: setupStage14(); break;
+                case 15: setupStage15(); break;
+                case 16: setupStage16(); break;
+                case 17: setupStage17(); break;
+            }
+
+            startTimer();
+            game.isRunning = true;
+        }
+
+        function startTimer() {
+            clearInterval(game.timerId);
+            cancelAnimationFrame(game.animFrameId);
+
+            elements.tsunamiContainer.style.transition = 'none';
+            const startTime = Date.now();
+            const totalDuration = game.maxTimer * 1000;
+
+            let lastT = Date.now();
+            function updateLoop() {
+                if (!game.isRunning) return;
+                const nowT = Date.now(); const dt = Math.min(0.1, (nowT - lastT) / 1000); lastT = nowT;
+
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, totalDuration - elapsed);
+                game.timer = remaining / 1000;
+
+                elements.timerText.textContent = game.timer.toFixed(1) + "s";
+
+                // Water rises linearly and reaches the character's head exactly when the timer hits 0
+                const progress = Math.min(1, elapsed / totalDuration);
+                if (game.tick) game.tick(dt, progress);
+                const headEl = elements.stageContainer.querySelector('[data-head]');
+                const boxRect = elements.stageContainer.getBoundingClientRect();
+                const headY = headEl ? headEl.getBoundingClientRect().top : boxRect.top + boxRect.height * 0.3;
+                const targetPx = Math.max(60, window.innerHeight - headY);
+                elements.tsunamiContainer.style.height = `${targetPx * progress}px`;
+
+                // Panic animation once the water gets close
+                const panicEl = document.getElementById('birdSvg');
+                if (panicEl) panicEl.classList.toggle('panic', progress > 0.55);
+
+                // Stage 6 Physics Decay (Slipping Pit)
+                if (game.stages[game.currentStage - 1].setup === 6 && game.stageData.climbHeight > 0) {
+                    // Constant friction dropping downward
+                    game.stageData.climbHeight = Math.max(0, game.stageData.climbHeight - 3.2 * dt);
+                    updateStage6Visual();
+                }
+
+                if (remaining <= 0) {
+                    triggerGameOver("물이 빠르게 차올라 탈출하지 못했습니다!");
+                    return;
+                }
+
+                game.animFrameId = requestAnimationFrame(updateLoop);
+            }
+
+            game.animFrameId = requestAnimationFrame(updateLoop);
+        }
+
+        function updateProgressBar(percent) {
+            const clamped = Math.min(100, Math.max(0, percent));
+            elements.progressBar.style.width = clamped + "%";
+            elements.progressValue.textContent = Math.floor(clamped) + "%";
+        }
+
+        function triggerKeyboardMash() {
+            // Forward Spacebar actions to relevant stages
+            if ([2, 4, 5, 6, 9, 12, 13, 16, 17].includes(game.stages[game.currentStage - 1].setup)) {
+                const targetBtn = elements.stageContainer.querySelector('.interactive-target');
+                if (targetBtn) targetBtn.click();
+            }
+        }
+
+        function stageComplete(delay = 500) {
+            game.isRunning = false;
+            clearInterval(game.timerId);
+            cancelAnimationFrame(game.animFrameId);
+
+            sfx.playSuccess();
+
+            setTimeout(() => {
+                if (game.currentStage >= game.totalStages) {
+                    elements.clearModal.classList.remove('hidden');
+                } else {
+                    elements.victoryMessage.textContent = `[${game.stages[game.currentStage - 1].title}] 미션 완료! 쓰나미로부터 안전합니다.`;
+                    elements.victoryModal.classList.remove('hidden');
+                }
+            }, delay);
+        }
+
+        function triggerGameOver(reason) {
+            game.isRunning = false;
+            clearInterval(game.timerId);
+            cancelAnimationFrame(game.animFrameId);
+
+            sfx.playSplash();
+            sfx.playFail();
+
+            elements.tsunamiContainer.style.transition = 'height 0.6s ease-in';
+            elements.tsunamiContainer.style.height = '100%';
+            elements.gameOverReason.textContent = reason || "쓰나미에 삼켜졌습니다!";
+
+            setTimeout(() => {
+                elements.gameOverModal.classList.remove('hidden');
+            }, 600);
+        }
+
+        /* ==========================================================================
+           5. STAGE 1 ~ 8 INDIVIDUAL IMPLEMENTATIONS
+           ========================================================================== */
+
+        // STAGE 1: Bird in Cage
+        function setupStage1() {
+            elements.keyHint.textContent = "💡 반짝이는 자물쇠를 눌러 새장 문을 열어주세요!";
+
+            elements.stageContainer.innerHTML = `
+                <div id="birdStageView" class="flex items-center justify-center relative w-full h-full">
+                    <div id="cageScene" class="cage-scene">
+                        <div id="cageGlow" class="cage-glow"></div>
+                        <div class="cage-hook"></div>
+                        <div class="cage-shell"><div class="cage-bars"></div></div>
+
+                        <!-- Bird (head is the water-level reference: data-head) -->
+                        <div id="bird" class="bird-wrap">
+                            <svg id="birdSvg" viewBox="0 0 80 80">
+                                <path d="M18 46 L2 40 L6 50 L2 58 L20 54 Z" fill="#f59e0b"/>
+                                <ellipse cx="38" cy="50" rx="22" ry="18" fill="#facc15"/>
+                                <ellipse cx="42" cy="57" rx="14" ry="9" fill="#fde68a"/>
+                                <g class="wing"><path d="M28 46 C16 34 30 26 46 40 C42 52 34 56 28 46Z" fill="#f59e0b"/></g>
+                                <path d="M52 20 q2 -9 8 -4 q-2 5 -6 5z" fill="#f59e0b"/>
+                                <circle data-head cx="56" cy="32" r="14" fill="#facc15"/>
+                                <circle cx="60" cy="29" r="4.6" fill="#fff"/>
+                                <circle cx="61.6" cy="29.2" r="2.3" fill="#0f172a"/>
+                                <circle cx="62.3" cy="28.3" r=".8" fill="#fff"/>
+                                <path d="M68 31 L79 35 L68 38 Z" fill="#fb923c"/>
+                                <circle cx="62" cy="37" r="3" fill="#fb7185" opacity=".6"/>
+                                <path d="M34 66 V73 M43 66 V73" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+
+                        <!-- Door (hinged on the left, swings open) -->
+                        <div id="cageDoor" class="cage-door">
+                            <button id="cageLock" class="interactive-target cage-lock" aria-label="새장 자물쇠">
+                                <svg viewBox="0 0 36 46">
+                                    <path class="shackle" d="M9 21 V13 a9 9 0 0 1 18 0 V21" fill="none" stroke="#e5e7eb" stroke-width="4.5" stroke-linecap="round"/>
+                                    <rect x="3" y="20" width="30" height="24" rx="6" fill="#fbbf24" stroke="#92400e" stroke-width="2"/>
+                                    <circle cx="18" cy="30" r="3.6" fill="#78350f"/>
+                                    <rect x="16.4" y="31" width="3.2" height="8" rx="1.4" fill="#78350f"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="cage-base"></div>
+                    </div>
+                </div>
+            `;
+
+            const scene = document.getElementById('cageScene');
+            const lock = document.getElementById('cageLock');
+            const door = document.getElementById('cageDoor');
+            const bird = document.getElementById('bird');
+            const glow = document.getElementById('cageGlow');
+            let opened = false;
+
+            function burst() {
+                // Golden sparkles
+                for (let i = 0; i < 16; i++) {
+                    const sp = document.createElement('div');
+                    sp.className = 'cage-spark';
+                    scene.appendChild(sp);
+                    const a = Math.random() * Math.PI * 2;
+                    const d = 50 + Math.random() * 90;
+                    sp.animate([
+                        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                        { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d - 20}px) scale(0)`, opacity: 0 }
+                    ], { duration: 600 + Math.random() * 600, easing: 'ease-out' }).onfinish = () => sp.remove();
+                }
+                // Falling feathers
+                for (let i = 0; i < 7; i++) {
+                    const f = document.createElement('div');
+                    f.className = 'cage-feather';
+                    scene.appendChild(f);
+                    const dx = (Math.random() - 0.5) * 140;
+                    f.animate([
+                        { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+                        { transform: `translate(${dx}px, ${70 + Math.random() * 70}px) rotate(${(Math.random() - 0.5) * 540}deg)`, opacity: 0 }
+                    ], { duration: 1300 + Math.random() * 700, easing: 'ease-in' }).onfinish = () => f.remove();
+                }
+            }
+
+            lock.addEventListener('click', () => {
+                if (!game.isRunning || opened) return;
+                opened = true;
+
+                // Stop the water immediately - the player made it in time
+                stageComplete(3000);
+
+                // 1) Padlock pops open
+                sfx.playClick();
+                lock.classList.add('unlocked');
+                elements.keyHint.textContent = "🔓 자물쇠가 풀렸어요!";
+
+                // 2) Padlock falls off
+                setTimeout(() => { sfx.playCut(); lock.classList.add('drop'); }, 350);
+
+                // 3) Door swings open + golden light
+                setTimeout(() => {
+                    sfx.playMetalSaw();
+                    door.classList.add('open');
+                    glow.classList.add('on');
+                    elements.keyHint.textContent = "🚪 새장 문이 열렸어요!";
+                }, 600);
+
+                // 4) Bird flies out
+                setTimeout(() => {
+                    bird.classList.add('escaping');
+                    burst();
+                    elements.keyHint.textContent = "🕊️ 새가 탈출했어요! 다음 스테이지로 이동합니다!";
+                }, 1300);
+            });
+        }
+
+        // ---------- shared graphics helpers ----------
+        const SVGNS = 'http://www.w3.org/2000/svg';
+        function pop(svg, x, y, color, n) {
+            n = n || 6;
+            for (let i = 0; i < n; i++) {
+                const c = document.createElementNS(SVGNS, 'circle');
+                c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 2.2); c.setAttribute('fill', color || '#fde047');
+                svg.appendChild(c);
+                const a = Math.random() * 6.28, d = 14 + Math.random() * 24;
+                c.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px)`, opacity: 0 }], { duration: 350 + Math.random() * 250, easing: 'ease-out' }).onfinish = () => c.remove();
+            }
+        }
+        function hearts(svg, x, y) {
+            for (let i = 0; i < 5; i++) {
+                const t = document.createElementNS(SVGNS, 'text');
+                t.textContent = '❤'; t.setAttribute('x', x + (i - 2) * 14); t.setAttribute('y', y); t.setAttribute('font-size', '14'); t.setAttribute('fill', '#fb7185');
+                svg.appendChild(t);
+                t.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(-${50 + i * 8}px)`, opacity: 0 }], { duration: 1200, delay: i * 120, easing: 'ease-out', fill: 'backwards' }).onfinish = () => t.remove();
+            }
+        }
+        function restart(el, cls) { el.classList.remove(cls); el.getBoundingClientRect(); el.classList.add(cls); }
+        function shakeStage() { elements.stageContainer.classList.add('shake'); setTimeout(() => elements.stageContainer.classList.remove('shake'), 100); }
+        const SCISSORS = `<g class="jawA"><path d="M0 0 L6 3 L1 42 Z" fill="#e2e8f0" stroke="#64748b"/><path d="M0 0 L-9 -20" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><circle cx="-12" cy="-29" r="8" fill="none" stroke="#dc2626" stroke-width="4"/></g><g class="jawB"><path d="M0 0 L-6 3 L-1 42 Z" fill="#cbd5e1" stroke="#64748b"/><path d="M0 0 L9 -20" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><circle cx="12" cy="-29" r="8" fill="none" stroke="#dc2626" stroke-width="4"/></g><circle r="3" fill="#475569"/>`;
+        const CUTTER_JAW = `<path d="M0 -3 L26 -1 L26 4 L0 3Z" fill="#94a3b8" stroke="#475569"/><path d="M0 0 L-52 0" stroke="#dc2626" stroke-width="6" stroke-linecap="round"/><path d="M-30 0 L-52 0" stroke="#111827" stroke-width="8" stroke-linecap="round"/>`;
+        const CUTTER = `<g class="jawA">${CUTTER_JAW}</g><g class="jawB">${CUTTER_JAW}</g><circle r="3.5" fill="#1e293b"/>`;
+
+        // STAGE 2: Dog Leash Cutting (10 Clicks) - scissors snip the rope tied to a post
+        function setupStage2() {
+            elements.progressContainer.classList.remove('hidden');
+            elements.progressLabel.textContent = "목줄 절단 진행도";
+            elements.keyHint.textContent = "💡 가위로 말뚝에 묶인 목줄을 10번 자르세요! (클릭 / 스페이스바)";
+            game.stageTarget = 10;
+            game.stageProgress = 0;
+
+            elements.stageContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full w-full py-1">
+                    <svg id="scene" viewBox="0 0 400 180" class="w-full h-44 md:h-48 rounded-2xl">
+                        <rect width="400" height="180" fill="#7dd3fc"/><rect y="154" width="400" height="26" fill="#4d7c0f"/>
+                        <rect x="40" y="70" width="20" height="90" rx="4" fill="#92400e" stroke="#451a03" stroke-width="2"/>
+                        <path d="M38 110 q12 7 24 0 M38 117 q12 7 24 0" stroke="#fbbf24" fill="none" stroke-width="4"/>
+                        <path id="leash" d="M56 115 Q160 140 268 126" stroke="#b45309" stroke-width="9" fill="none" stroke-linecap="round"/>
+                        <path id="leashTex" d="M56 115 Q160 140 268 126" stroke="#fcd34d" stroke-width="8" fill="none" stroke-dasharray="3 5" opacity=".6"/>
+                        <path id="notch" d="M155 124 L160 135 L165 124Z" fill="#451a03" style="opacity:0"/>
+                        <g id="stubs" style="display:none" stroke="#b45309" stroke-width="7" fill="none" stroke-linecap="round"><path d="M56 115 Q95 132 140 152"/><path d="M268 126 Q232 142 186 156"/></g>
+                        <g transform="translate(290,128)"><g id="dog" class="dog">
+                            <path class="tail" d="M28 -8 q16 -14 9 -28" stroke="#b45309" stroke-width="7" fill="none" stroke-linecap="round"/>
+                            <rect x="-12" y="8" width="8" height="18" rx="3" fill="#b45309"/><rect x="2" y="8" width="8" height="18" rx="3" fill="#b45309"/><rect x="16" y="8" width="8" height="18" rx="3" fill="#b45309"/><rect x="28" y="8" width="8" height="18" rx="3" fill="#b45309"/>
+                            <ellipse cx="8" cy="0" rx="28" ry="17" fill="#d97706"/>
+                            <circle data-head cx="-30" cy="-14" r="15" fill="#f59e0b"/>
+                            <ellipse cx="-22" cy="-24" rx="6" ry="11" transform="rotate(20 -22 -24)" fill="#92400e"/>
+                            <ellipse cx="-42" cy="-8" rx="9" ry="7" fill="#fde68a"/><circle cx="-49" cy="-11" r="3" fill="#111"/>
+                            <circle cx="-32" cy="-17" r="3" fill="#111"/>
+                            <g class="sad"><path d="M-38 -24 L-28 -21" stroke="#451a03" stroke-width="2"/><path d="M-30 -13 q-2 6 0 8 q3 -2 0 -8z" fill="#38bdf8"/></g>
+                            <g class="hap" style="display:none"><path d="M-46 -4 q6 6 12 0" stroke="#7f1d1d" stroke-width="2" fill="none"/><ellipse cx="-39" cy="1" rx="3" ry="4" fill="#fb7185"/></g>
+                            <rect x="-24" y="-8" width="7" height="15" rx="2" transform="rotate(-12 -20 0)" fill="#dc2626"/><circle cx="-22" cy="-2" r="3.2" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                        </g></g>
+                        <g transform="translate(160,90)"><g id="scis">${SCISSORS}</g></g>
+                    </svg>
+                    <button id="cutLeashBtn" class="interactive-target px-8 py-3 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-title text-xl rounded-2xl shadow-lg border-2 border-rose-300/40 flex items-center gap-3 btn-action">
+                        <i class="fas fa-scissors text-2xl"></i><span>목줄 자르기 (0 / 10)</span>
+                    </button>
+                </div>`;
+
+            const btn = document.getElementById('cutLeashBtn'), svg = document.getElementById('scene');
+            btn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playCut();
+                game.stageProgress++;
+                const p = game.stageProgress / game.stageTarget;
+                updateProgressBar(p * 100);
+                btn.querySelector('span').textContent = `목줄 자르기 (${game.stageProgress} / 10)`;
+                restart(document.getElementById('scis'), 'snip');
+                pop(svg, 160, 132, '#fde047', 5);
+                document.getElementById('leash').setAttribute('stroke-width', 9 - 6 * p);
+                document.getElementById('leashTex').setAttribute('stroke-width', 8 - 6 * p);
+                document.getElementById('notch').style.opacity = p;
+                shakeStage();
+                if (game.stageProgress >= game.stageTarget) {
+                    ['leash', 'leashTex', 'notch'].forEach(id => document.getElementById(id).style.display = 'none');
+                    document.getElementById('stubs').style.display = '';
+                    const dog = document.getElementById('dog');
+                    dog.querySelector('.sad').style.display = 'none';
+                    dog.querySelector('.hap').style.display = '';
+                    setTimeout(() => dog.classList.add('run'), 250);
+                    hearts(svg, 270, 90);
+                    stageComplete(2300);
+                }
+            });
+        }
+
+        // STAGE 3: Handcuffed to a tree - find the 3-tooth key
+        function keyInner(n) {
+            let t = ''; const st = 17 / n, w = Math.min(3.2, st * 0.65);
+            for (let i = 0; i < n; i++) t += `<rect x="${18 + i * st}" y="21" width="${w}" height="${5 + ((i * 2 + n) % 3) * 2}" fill="currentColor"/>`;
+            return `<circle cx="9" cy="17" r="7" fill="none" stroke="currentColor" stroke-width="3.5"/><rect x="15" y="15" width="22" height="4" fill="currentColor"/>${t}`;
+        }
+        function setupStage3() {
+            elements.keyHint.textContent = "💡 수갑 열쇠 구멍에 맞는 '톱니 3개' 열쇠를 30개 중에서 찾아 클릭하세요!";
+            const correctIndex = Math.floor(Math.random() * 30);
+
+            elements.stageContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full w-full gap-1">
+                    <svg id="scene" viewBox="0 0 400 150" class="w-full h-32 md:h-36 rounded-2xl bg-slate-900/70">
+                        <rect y="140" width="400" height="10" fill="#365314"/>
+                        <rect x="268" y="22" width="44" height="120" rx="8" fill="#78350f" stroke="#451a03" stroke-width="2"/>
+                        <circle cx="290" cy="22" r="34" fill="#15803d"/><circle cx="262" cy="34" r="22" fill="#166534"/><circle cx="318" cy="34" r="22" fill="#166534"/>
+                        <circle cx="276" cy="100" r="8" fill="none" stroke="#94a3b8" stroke-width="3.5"/>
+                        <path class="chain fb" d="M130 103 Q200 135 270 100" stroke="#cbd5e1" stroke-width="4.5" fill="none" stroke-dasharray="8 4" stroke-linecap="round"/>
+                        <g transform="translate(120,0)"><g id="person">
+                            <rect x="-14" y="104" width="11" height="36" rx="4" fill="#1e3a8a"/><rect x="3" y="104" width="11" height="36" rx="4" fill="#1e3a8a"/>
+                            <rect x="-17" y="136" width="15" height="6" rx="3" fill="#111827"/><rect x="2" y="136" width="15" height="6" rx="3" fill="#111827"/>
+                            <rect x="-19" y="62" width="38" height="46" rx="12" fill="#3b82f6"/>
+                            <circle data-head cx="0" cy="46" r="16" fill="#fcd9b6"/><path d="M-16 43 a16 14 0 0 1 32 0 q-16 -8 -32 0z" fill="#451a03"/>
+                            <circle cx="-5" cy="48" r="2" fill="#111"/><circle cx="5" cy="48" r="2" fill="#111"/>
+                            <path d="M-9 42 l7 -2 M9 42 l-7 -2" stroke="#451a03" stroke-width="1.8"/><path d="M-5 57 q5 -4 10 0" stroke="#7f1d1d" fill="none" stroke-width="1.8"/>
+                            <path d="M19 40 q4 6 0 8 q-4 -2 0 -8z" fill="#7dd3fc"/>
+                            <g id="armsDown">
+                                <path d="M-19 70 Q-27 92 -5 102 M19 70 Q27 92 5 102" stroke="#fcd9b6" stroke-width="9" fill="none" stroke-linecap="round"/>
+                                <g class="cuffL fb"><circle cx="-7" cy="101" r="7" fill="none" stroke="#e2e8f0" stroke-width="4.5"/><rect x="-11" y="92" width="8" height="5" fill="#94a3b8"/></g>
+                                <g class="cuffR fb"><circle cx="7" cy="101" r="7" fill="none" stroke="#e2e8f0" stroke-width="4.5"/><rect x="3" y="92" width="8" height="5" fill="#94a3b8"/></g>
+                            </g>
+                            <g id="armsUp" style="display:none"><path d="M-19 70 Q-36 58 -32 30 M19 70 Q36 58 32 30" stroke="#fcd9b6" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M-5 57 q5 5 10 0" stroke="#7f1d1d" fill="none" stroke-width="2"/></g>
+                        </g></g>
+                        <g transform="translate(8,8)"><rect width="92" height="46" rx="8" fill="#0f172a" stroke="#fbbf24"/><text x="46" y="13" font-size="9" fill="#fde68a" text-anchor="middle">찾을 열쇠 (톱니 3개)</text>
+                            <svg x="24" y="17" width="44" height="26" viewBox="0 0 40 34" style="color:#fbbf24">${keyInner(3)}</svg></g>
+                    </svg>
+                    <div id="keyGrid" class="grid grid-cols-8 gap-1.5 w-full max-h-44 overflow-y-auto p-2 bg-slate-900/80 rounded-2xl border border-slate-700/80"></div>
+                </div>`;
+
+            const keyGrid = document.getElementById('keyGrid'), scene = document.getElementById('scene');
+            const wrongTeeth = [1, 2, 4, 5, 6];
+            for (let i = 0; i < 30; i++) {
+                const isCorrect = (i === correctIndex);
+                const n = isCorrect ? 3 : wrongTeeth[Math.floor(Math.random() * wrongTeeth.length)];
+                const keyBtn = document.createElement('button');
+                keyBtn.className = "key-item p-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-amber-400 btn-action";
+                keyBtn.innerHTML = `<svg viewBox="0 0 40 34" class="w-full h-7">${keyInner(n)}</svg>`;
+                keyBtn.addEventListener('click', () => {
+                    if (!game.isRunning) return;
+                    if (isCorrect) {
+                        sfx.playMetalSaw();
+                        keyBtn.className = "key-item p-1 bg-emerald-500 text-white rounded-lg";
+                        scene.classList.add('free');
+                        document.getElementById('armsDown').style.display = 'none';
+                        document.getElementById('armsUp').style.display = '';
+                        document.getElementById('person').classList.add('cheer');
+                        pop(scene, 120, 100, '#fde047', 12);
+                        stageComplete(1900);
+                    } else {
+                        sfx.playClick();
+                        keyBtn.disabled = true;
+                        keyBtn.classList.add('opacity-30', 'bg-red-900/40', 'border-red-800');
+                        shakeStage();
+                    }
+                });
+                keyGrid.appendChild(keyBtn);
+            }
+        }
+
+        // STAGE 4: Prison bar sawing (100 strokes) - hacksaw cuts the bar in front of the prisoner
+        function setupStage4() {
+            elements.progressContainer.classList.remove('hidden');
+            elements.progressLabel.textContent = "쇠창살 절단 진행률";
+            elements.keyHint.textContent = "💡 톱으로 쇠창살을 40번 썰으세요! (연타 클릭 / 스페이스바)";
+            game.stageTarget = 40;
+            game.stageProgress = 0;
+            let teeth = ''; for (let i = 0; i < 16; i++) teeth += 'l3 6 l3 -6 ';
+            let bars = ''; [100, 150, 250, 300].forEach(x => bars += `<rect x="${x - 4.5}" y="24" width="9" height="140" fill="#94a3b8" stroke="#475569"/>`);
+
+            elements.stageContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full w-full py-1">
+                    <svg id="scene" viewBox="0 0 400 190" class="w-full h-44 md:h-48 rounded-2xl">
+                        <defs>
+                            <pattern id="brick" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#334155"/><path d="M0 .5H40M0 10.5H40M20 .5V10M10 10.5V20M30 10.5V20" stroke="#1e293b" stroke-width="1.5"/></pattern>
+                            <pattern id="stripe" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="4" fill="#f8fafc"/><rect y="4" width="8" height="4" fill="#111827"/></pattern>
+                        </defs>
+                        <rect width="400" height="190" fill="url(#brick)"/>
+                        <rect x="70" y="24" width="260" height="140" rx="6" fill="#0b1220" stroke="#64748b" stroke-width="6"/>
+                        <g id="pris">
+                            <rect x="181" y="104" width="38" height="58" rx="8" fill="url(#stripe)" stroke="#111827"/>
+                            <path d="M184 112 L152 118 M216 112 L248 118" stroke="#fcd9b6" stroke-width="8" stroke-linecap="round"/><circle cx="152" cy="118" r="5" fill="#fcd9b6"/><circle cx="248" cy="118" r="5" fill="#fcd9b6"/>
+                            <circle data-head cx="200" cy="86" r="16" fill="#fcd9b6"/><path d="M184 82 a16 12 0 0 1 32 0z" fill="url(#stripe)" stroke="#111827"/>
+                            <circle cx="194" cy="88" r="2" fill="#111"/><circle cx="206" cy="88" r="2" fill="#111"/><path d="M195 97 q5 -4 10 0" stroke="#7f1d1d" fill="none" stroke-width="1.8"/>
+                        </g>
+                        ${bars}
+                        <rect id="barT" class="fb" x="195.5" y="24" width="9" height="76" fill="#94a3b8" stroke="#475569"/>
+                        <rect id="barB" class="fb" x="195.5" y="102" width="9" height="62" fill="#94a3b8" stroke="#475569"/>
+                        <rect id="kerf" x="195.5" y="99" width="0" height="4" fill="#fb923c"/>
+                        <g transform="translate(200,100)"><g id="saw">
+                            <rect x="-70" y="-2" width="100" height="8" fill="#cbd5e1" stroke="#64748b"/><path d="M-70 6 ${teeth}" fill="#94a3b8"/>
+                            <path d="M-70 -2 V-28 H34 V-2" fill="none" stroke="#94a3b8" stroke-width="5"/><rect x="30" y="-36" width="26" height="16" rx="4" fill="#b45309"/>
+                        </g></g>
+                    </svg>
+                    <button id="sawBtn" class="interactive-target w-full py-3 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-amber-400 font-title text-xl rounded-2xl border border-slate-600 shadow-xl flex items-center justify-center gap-3 btn-action">
+                        <i class="fas fa-screwdriver-wrench text-2xl"></i><span>톱질하기 (0 / 40)</span>
+                    </button>
+                </div>`;
+
+            const sawBtn = document.getElementById('sawBtn'), svg = document.getElementById('scene');
+            sawBtn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playMetalSaw();
+                game.stageProgress++;
+                const p = game.stageProgress / game.stageTarget;
+                updateProgressBar(p * 100);
+                sawBtn.querySelector('span').textContent = `톱질하기 (${game.stageProgress} / 40)`;
+                restart(document.getElementById('saw'), 'sawing');
+                document.getElementById('kerf').setAttribute('width', 9 * p);
+                if (game.stageProgress % 2 === 0) pop(svg, 200, 102, '#fb923c', 4);
+                if (game.stageProgress >= game.stageTarget) {
+                    document.getElementById('kerf').setAttribute('width', 9);
+                    document.getElementById('barT').classList.add('fallT');
+                    document.getElementById('barB').classList.add('fallB');
+                    document.getElementById('saw').style.display = 'none';
+                    pop(svg, 200, 102, '#fde047', 14);
+                    document.getElementById('pris').classList.add('prisOut');
+                    stageComplete(2000);
+                }
+            });
+        }
+
+        // STAGE 5: Soldier cuts a wire-mesh fence with bolt cutters (200 snips)
+        function setupStage5() {
+            elements.progressContainer.classList.remove('hidden');
+            elements.progressLabel.textContent = "철책 해체 진행률";
+            elements.keyHint.textContent = "💡 절단기질 50회 필요! (마우스 우다다 클릭 또는 스페이스바 연타)";
+            game.stageTarget = 50;
+            game.stageProgress = 0;
+
+            elements.stageContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full w-full py-1">
+                    <svg id="scene" viewBox="0 0 400 180" class="w-full h-44 md:h-48 rounded-2xl">
+                        <defs>
+                            <pattern id="mesh" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H14M0 0V14" stroke="#cbd5e1" stroke-width="1.5"/></pattern>
+                            <mask id="hole"><rect width="400" height="180" fill="#fff"/><circle id="holeC" cx="300" cy="100" r="0" fill="#000"/></mask>
+                        </defs>
+                        <rect width="226" height="180" fill="#1e293b"/><rect x="226" width="174" height="180" fill="#bbf7d0"/>
+                        <rect y="150" width="226" height="30" fill="#334155"/><rect x="226" y="150" width="174" height="30" fill="#4ade80"/>
+                        <rect x="350" y="52" width="4" height="98" fill="#78350f"/><path d="M354 52 L384 62 L354 74Z" fill="#ef4444"/>
+                        <text x="300" y="30" font-size="11" fill="#166534" text-anchor="middle" font-weight="bold">안전지대</text>
+                        <g mask="url(#hole)">
+                            <rect x="226" y="36" width="164" height="114" fill="url(#mesh)"/>
+                            <rect x="222" y="30" width="6" height="124" fill="#475569"/><rect x="386" y="30" width="6" height="124" fill="#475569"/>
+                            <path d="M222 36 H392" stroke="#64748b" stroke-width="3"/><path d="M230 30 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6 l6 6" stroke="#94a3b8" stroke-width="2" fill="none"/>
+                        </g>
+                        <g transform="translate(120,0)"><g id="sold">
+                            <rect x="-30" y="66" width="13" height="34" rx="4" fill="#3f4a1f"/>
+                            <rect x="-14" y="110" width="12" height="38" rx="4" fill="#4d5a26"/><rect x="2" y="110" width="12" height="38" rx="4" fill="#4d5a26"/>
+                            <rect x="-17" y="144" width="17" height="7" rx="3" fill="#111827"/><rect x="2" y="144" width="17" height="7" rx="3" fill="#111827"/>
+                            <rect x="-18" y="62" width="36" height="50" rx="10" fill="#556b2f"/><circle cx="-6" cy="78" r="5" fill="#3f4a1f"/><circle cx="8" cy="94" r="6" fill="#3f4a1f"/><circle cx="-8" cy="100" r="4" fill="#6b7f3a"/>
+                            <circle data-head cx="0" cy="48" r="13" fill="#fcd9b6"/>
+                            <path d="M-17 44 a17 16 0 0 1 34 0z" fill="#4d7c0f" stroke="#365314" stroke-width="1.5"/><rect x="-19" y="43" width="38" height="4" rx="2" fill="#365314"/>
+                            <circle cx="6" cy="52" r="1.8" fill="#111"/><path d="M2 59 h8" stroke="#7f1d1d" stroke-width="1.8"/>
+                            <path d="M14 72 L58 98 M10 82 L54 108" stroke="#556b2f" stroke-width="9" stroke-linecap="round"/>
+                            <circle cx="60" cy="99" r="5" fill="#fcd9b6"/><circle cx="56" cy="108" r="5" fill="#fcd9b6"/>
+                        </g></g>
+                        <g transform="translate(206,102)"><g id="cutter">${CUTTER}</g></g>
+                    </svg>
+                    <button id="wireCutBtn" class="interactive-target w-full py-3 bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-white font-title text-xl rounded-2xl border border-emerald-500/50 shadow-xl flex items-center justify-center gap-3 btn-action">
+                        <i class="fas fa-scissors text-2xl"></i><span>철조망 절단 (0 / 50)</span>
+                    </button>
+                </div>`;
+
+            const btn = document.getElementById('wireCutBtn'), svg = document.getElementById('scene');
+            btn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playCut();
+                game.stageProgress++;
+                const p = game.stageProgress / game.stageTarget;
+                updateProgressBar(p * 100);
+                btn.querySelector('span').textContent = `철조망 절단 (${game.stageProgress} / 50)`;
+                restart(document.getElementById('cutter'), 'snip');
+                document.getElementById('holeC').setAttribute('r', 6 + p * 60);
+                if (game.stageProgress % 2 === 0) pop(svg, 232, 102, '#e2e8f0', 3);
+                if (game.stageProgress >= game.stageTarget) {
+                    document.getElementById('cutter').style.display = 'none';
+                    setTimeout(() => document.getElementById('sold').classList.add('soldRun'), 250);
+                    stageComplete(2200);
+                }
+            });
+        }
+
+        // STAGE 6 (final round): Wall-jump zigzag up a slippery pit against gravity
+        function setupStage6() {
+            showProgress("점프 고도", "💡 클릭할 때마다 반대편 벽을 차고 지그재그로 점프! 연타를 멈추면 진흙과 중력 때문에 미끄러져 떨어져요! (스페이스바 가능)");
+            // --- difficulty knobs (final round is meant to be nearly impossible) ---
+            const GAIN = 1.0;   // height gained per wall kick (%)
+            const SLIP = 5;     // constant slipping down (%/s)
+            const GRAV = 55;    // extra falling acceleration while not jumping
+            const KICK = 14;    // how much each kick cancels the falling speed
+            const WALL = { '-1': 78, '1': 322 };
+            game.stageData = { h: 0 };
+            let h = 0, fallV = 0, side = -1, x = WALL['-1'], from = x, to = x, tt = 1, landed = true;
+            let flow = '';
+            [14, 36, 58, 342, 364, 386].forEach((px, i) => flow += `<path class="mudflow" style="animation-delay:-${i * 0.15}s" d="M${px} 40 V186" stroke="#7c4a1e" stroke-width="3"/>`);
+
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#7dd3fc"/><circle cx="200" cy="-6" r="26" fill="#fde047"/>
+                <rect y="40" width="400" height="150" fill="#3f2a14"/>
+                <rect width="70" y="30" height="160" fill="#78350f"/><rect x="330" y="30" width="70" height="160" fill="#78350f"/>
+                <rect width="70" y="22" height="14" fill="#4d7c0f"/><rect x="330" y="22" width="70" height="14" fill="#4d7c0f"/>
+                ${flow}
+                <path d="M70 30 V190 M330 30 V190" stroke="#a16207" stroke-width="3" opacity=".6"/>
+                <text x="200" y="30" font-size="10" fill="#0c4a6e" text-anchor="middle" font-weight="bold">▲ 지상 (탈출구)</text>
+                <g id="cl" transform="translate(78,168)"><g id="cb">
+                    <path d="M-2 -24 L-14 -10 L-12 -2 M4 -24 L10 -8 L6 0" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <rect x="-12" y="-50" width="24" height="30" rx="7" fill="#ef4444"/>
+                    <path d="M-10 -44 L-18 -30 M10 -44 L18 -34" stroke="#fcd9b6" stroke-width="6" stroke-linecap="round"/>
+                    <circle data-head cy="-60" r="12" fill="#fcd9b6"/><path d="M-12 -62 a12 10 0 0 1 24 0z" fill="#facc15"/>
+                    <circle cx="4" cy="-59" r="1.8" fill="#111"/><circle cx="-4" cy="-59" r="1.8" fill="#111"/><path d="M-4 -53 h8" stroke="#7f1d1d" stroke-width="1.8"/>
+                </g></g>`) + actBtn('from-rose-600 to-red-800', 'fa-person-running', '벽 차고 점프! (초고속 연타)'));
+
+            const svg = document.getElementById('scene'), cl = document.getElementById('cl'), cb = document.getElementById('cb');
+            cb.style.transformOrigin = '0px -30px';
+            function render(yoff) {
+                const y = 168 - h * 1.28 - (yoff || 0);
+                cl.setAttribute('transform', `translate(${x},${y}) scale(${side === -1 ? 1 : -1},1)`);
+                updateProgressBar(h);
+            }
+            render(0);
+            game.tick = dt => {
+                fallV = Math.min(40, fallV + GRAV * dt);
+                h = Math.max(0, h - (SLIP + fallV) * dt);
+                let hop = 0;
+                if (tt < 1) {
+                    tt = Math.min(1, tt + dt / 0.16);
+                    const e = tt < 0.5 ? 2 * tt * tt : 1 - Math.pow(-2 * tt + 2, 2) / 2;
+                    x = from + (to - from) * e; hop = 12 * Math.sin(Math.PI * tt);
+                    cb.style.transform = 'rotate(-20deg)';
+                } else {
+                    cb.style.transform = 'rotate(0deg)';
+                    if (!landed) { landed = true; pop(svg, to + (side === -1 ? -8 : 8), 168 - h * 1.28 - 12, '#a16207', 4); }
+                }
+                render(hop);
+            };
+            document.getElementById('actBtn').addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playClick();
+                pop(svg, side === -1 ? 70 : 330, 168 - h * 1.28 - 12, '#a16207', 3);
+                side = -side; from = x; to = WALL[side]; tt = 0; landed = false;
+                h = Math.min(100, h + GAIN); fallV = Math.max(0, fallV - KICK);
+                if (h >= 100) {
+                    game.tick = null;
+                    const y = 168 - 128;
+                    cl.animate([{ transform: `translate(${x}px,${y}px) scale(${side === -1 ? 1 : -1},1)` }, { transform: `translate(200px,${y - 70}px) scale(1,1)` }], { duration: 700, easing: 'ease-out', fill: 'forwards' });
+                    pop(svg, 200, 40, '#fde047', 16); updateProgressBar(100);
+                    stageComplete(1500);
+                }
+            });
+        }
+        function updateStage6Visual() { /* replaced by wall-jump physics in setupStage6 */ }
+
+        // BONUS STAGE 7: Submarine hatch - spin the valve wheel to retract the locking bolts
+        function setupStage7() {
+            elements.progressContainer.classList.remove('hidden');
+            elements.progressLabel.textContent = "밸브 해제 회전수";
+            elements.keyHint.textContent = "💡 밸브를 클릭하여 시계방향으로 20바퀴 돌려 잠금 볼트를 풀어주세요!";
+            game.stageTarget = 20;
+            game.stageProgress = 0;
+            let ang = 0;
+            let bolts = ''; for (let i = 0; i < 8; i++) bolts += `<rect id="bolt${i}" x="-8" y="-6" width="16" height="12" rx="2" fill="#a16207" stroke="#451a03" transform="rotate(${i * 45}) translate(68,0)"/>`;
+            let spokes = ''; for (let i = 0; i < 6; i++) spokes += `<path d="M0 0 L0 -30" stroke="#d97706" stroke-width="5" stroke-linecap="round" transform="rotate(${i * 60})"/>`;
+
+            elements.stageContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full w-full py-1">
+                    <svg id="scene" viewBox="0 0 400 190" class="w-full h-44 md:h-48 rounded-2xl">
+                        <rect width="400" height="190" fill="#334155"/>
+                        <g fill="#1e293b"><circle cx="20" cy="20" r="3"/><circle cx="380" cy="20" r="3"/><circle cx="20" cy="170" r="3"/><circle cx="380" cy="170" r="3"/></g>
+                        <circle cx="200" cy="95" r="86" fill="#475569" stroke="#1e293b" stroke-width="5"/>
+                        <g id="behind">
+                            <circle cx="200" cy="95" r="66" fill="#fde68a"/>
+                            <circle cx="200" cy="82" r="15" fill="#fcd9b6"/><rect x="182" y="96" width="36" height="46" rx="10" fill="#3b82f6"/>
+                            <circle cx="195" cy="84" r="2" fill="#111"/><circle cx="205" cy="84" r="2" fill="#111"/><path d="M194 91 q6 6 12 0" stroke="#7f1d1d" fill="none" stroke-width="2"/>
+                            <path d="M184 102 L168 70 M216 102 L232 70" stroke="#fcd9b6" stroke-width="8" stroke-linecap="round"/>
+                        </g>
+                        <g id="door" style="transform-origin:134px 95px; transition: transform .9s cubic-bezier(.4,1.3,.5,1)">
+                            <circle cx="200" cy="95" r="66" fill="#64748b" stroke="#334155" stroke-width="4"/>
+                            <circle cx="200" cy="56" r="17" fill="#0f172a" stroke="#94a3b8" stroke-width="5"/>
+                            <circle cx="200" cy="58" r="10" fill="#fcd9b6"/><circle cx="196" cy="56" r="1.8" fill="#111"/><circle cx="204" cy="56" r="1.8" fill="#111"/><ellipse cx="200" cy="63" rx="3" ry="2.5" fill="#7f1d1d"/>
+                            <circle cx="188" cy="68" r="4" fill="#fcd9b6"/><circle cx="212" cy="68" r="4" fill="#fcd9b6"/>
+                            <path d="M160 100 Q170 118 190 122 M240 100 Q230 118 210 122" stroke="#a16207" stroke-width="0" fill="none"/>
+                            <g id="hatchWheel" style="transform-origin:200px 124px; transition: transform .08s; cursor:pointer">
+                                <circle cx="200" cy="124" r="40" fill="transparent"/>
+                                <g transform="translate(200,124)">
+                                    <circle r="30" fill="none" stroke="#b45309" stroke-width="6"/>${spokes}
+                                    <circle r="9" fill="#92400e" stroke="#451a03" stroke-width="2"/><circle cx="-10" cy="-14" r="3" fill="#7c2d12"/><circle cx="12" cy="10" r="3" fill="#7c2d12"/>
+                                    <circle cy="-30" r="7" fill="#fcd9b6" stroke="#b45309" stroke-width="2"/>
+                                </g>
+                            </g>
+                            <path d="M168 150 A44 44 0 0 0 232 150" fill="none" stroke="#fde047" stroke-width="3" stroke-dasharray="5 4"/><path d="M226 156 L234 148 L236 160Z" fill="#fde047"/>
+                        </g>
+                        <g transform="translate(200,95)">${bolts}</g>
+                    </svg>
+                    <p class="text-xs text-sky-300 font-bold">회전 회수: <span id="rotCount">0</span> / 20 바퀴 · 볼트 <span id="boltCount">0</span> / 8 해제</p>
+                </div>`;
+
+            const wheel = document.getElementById('hatchWheel'), rotCount = document.getElementById('rotCount'), svg = document.getElementById('scene');
+            function setBolts() {
+                let freed = 0;
+                for (let i = 0; i < 8; i++) {
+                    const c = Math.min(1, Math.max(0, (game.stageProgress - i * 2.5) / 2.5));
+                    if (c >= 1) freed++;
+                    document.getElementById('bolt' + i).setAttribute('transform', `rotate(${i * 45}) translate(${68 + 16 * c},0)`);
+                }
+                document.getElementById('boltCount').textContent = freed;
+            }
+            wheel.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playMetalSaw();
+                ang += 120;
+                wheel.style.transform = `rotate(${ang}deg)`;
+                if (ang % 360 === 0) {
+                    game.stageProgress++;
+                    rotCount.textContent = game.stageProgress;
+                    updateProgressBar((game.stageProgress / game.stageTarget) * 100);
+                    setBolts();
+                    pop(svg, 200, 124, '#fbbf24', 4);
+                    if (game.stageProgress >= game.stageTarget) {
+                        document.getElementById('door').style.transform = 'scaleX(.1)';
+                        pop(svg, 200, 95, '#fde047', 16);
+                        stageComplete(1800);
+                    }
+                }
+            });
+        }
+
+        // BONUS STAGE 8: Chained person - crack the 3-digit padlock, then smash the chains
+        function setupStage8() {
+            let secretCode;
+            do { secretCode = [0, 1, 2].map(() => Math.floor(Math.random() * 10)); } while (secretCode.every(d => d === 0));
+            elements.keyHint.textContent = `💡 자물쇠 숫자의 위쪽(▲)을 누르면 +1, 아래쪽(▼)을 누르면 -1! 힌트 ${secretCode.join('-')}에 맞춘 뒤 사슬을 파쇄하세요!`;
+            let enteredCode = [0, 0, 0];
+            let unlocked = false;
+            let dials = ''; for (let i = 0; i < 3; i++) { const x = -25 + i * 17; dials += `<rect x="${x}" y="98" width="15" height="24" rx="3" fill="#fff" stroke="#92400e"/><text id="dg${i}" x="${x + 7.5}" y="116" font-size="16" font-weight="bold" font-family="monospace" fill="#0f172a" text-anchor="middle">0</text><path d="M${x + 3.5} 96 l4 -6 l4 6z" fill="#fde047"/><path d="M${x + 3.5} 125 l4 6 l4 -6z" fill="#fde047"/><rect class="dial-hit" data-idx="${i}" data-d="1" x="${x}" y="88" width="15" height="22" fill="transparent" style="cursor:pointer"/><rect class="dial-hit" data-idx="${i}" data-d="-1" x="${x}" y="110" width="15" height="24" fill="transparent" style="cursor:pointer"/>`; }
+
+            elements.stageContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-between h-full w-full py-1">
+                    <svg id="scene" viewBox="0 0 400 190" class="w-full h-44 md:h-48 rounded-2xl bg-slate-900/70">
+                        <rect y="176" width="400" height="14" fill="#1e293b"/>
+                        <g id="person" transform="translate(200,0)">
+                            <rect x="-15" y="124" width="12" height="50" rx="4" fill="#1e3a8a"/><rect x="3" y="124" width="12" height="50" rx="4" fill="#1e3a8a"/>
+                            <rect x="-22" y="52" width="44" height="76" rx="14" fill="#f97316"/>
+                            <circle data-head cx="0" cy="36" r="17" fill="#fcd9b6"/><path d="M-17 32 a17 15 0 0 1 34 0 q-17 -8 -34 0z" fill="#451a03"/>
+                            <circle cx="-6" cy="38" r="2" fill="#111"/><circle cx="6" cy="38" r="2" fill="#111"/><path d="M-10 32 l7 -2 M10 32 l-7 -2" stroke="#451a03" stroke-width="1.8"/><path d="M-6 48 q6 -4 12 0" stroke="#7f1d1d" fill="none" stroke-width="2"/>
+                            <g id="armsUp" style="display:none"><path d="M-22 62 Q-44 50 -38 22 M22 62 Q44 50 38 22" stroke="#fcd9b6" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+                            <path class="chain8" id="ch1" d="M-27 70 Q0 82 27 70" stroke="#94a3b8" stroke-width="6" fill="none" stroke-dasharray="10 4" stroke-linecap="round" style="--dx:-60px;--dy:20px;--dr:-40deg"/>
+                            <path class="chain8" id="ch2" d="M-27 86 Q0 98 27 86" stroke="#94a3b8" stroke-width="6" fill="none" stroke-dasharray="10 4" stroke-linecap="round" style="--dx:60px;--dy:30px;--dr:50deg"/>
+                            <path class="chain8" id="ch3" d="M-25 136 Q0 146 25 136" stroke="#94a3b8" stroke-width="6" fill="none" stroke-dasharray="10 4" stroke-linecap="round" style="--dx:-40px;--dy:50px;--dr:-60deg"/>
+                            <path class="chain8" id="ch4" d="M-14 168 Q0 176 14 168" stroke="#94a3b8" stroke-width="6" fill="none" stroke-dasharray="10 4" stroke-linecap="round" style="--dx:50px;--dy:40px;--dr:60deg"/>
+                            <g id="lockG" transform="translate(0,0)">
+                                <path id="shackle" class="fb" d="M-14 96 V82 a14 14 0 0 1 28 0 V96" stroke="#e5e7eb" stroke-width="7" fill="none" stroke-linecap="round" style="transition:transform .4s"/>
+                                <rect x="-30" y="92" width="60" height="38" rx="9" fill="#f59e0b" stroke="#92400e" stroke-width="2"/>
+                                ${dials}
+                            </g>
+                        </g>
+                        <g transform="translate(10,12)"><rect width="92" height="26" rx="8" fill="#0f172a" stroke="#fbbf24"/><text x="46" y="17" font-size="11" fill="#fde68a" text-anchor="middle" font-weight="bold">🔑 힌트 ${secretCode.join(' · ')}</text></g>
+                    </svg>
+                    <button id="finalSmashBtn" class="interactive-target w-full py-3 bg-slate-800 text-slate-500 font-title text-xl rounded-2xl border border-slate-700 shadow-xl flex items-center justify-center gap-3 cursor-not-allowed">
+                        <i class="fas fa-lock text-2xl"></i><span>자물쇠 숫자를 맞추세요</span>
+                    </button>
+                </div>`;
+
+            const svg = document.getElementById('scene'), finalSmashBtn = document.getElementById('finalSmashBtn');
+            svg.querySelectorAll('.dial-hit').forEach(g => {
+                g.addEventListener('click', () => {
+                    if (!game.isRunning || unlocked) return;
+                    sfx.playClick();
+                    const idx = parseInt(g.dataset.idx), d = parseInt(g.dataset.d);
+                    enteredCode[idx] = (enteredCode[idx] + d + 10) % 10;
+                    document.getElementById('dg' + idx).textContent = enteredCode[idx];
+                    if (enteredCode.every((v, i) => v === secretCode[i])) {
+                        unlocked = true;
+                        sfx.playSuccess();
+                        document.getElementById('shackle').style.transform = 'translateY(-9px) rotate(-25deg)';
+                        svg.querySelectorAll('.chain8').forEach(c => c.classList.add('glow'));
+                        pop(svg, 200, 110, '#fde047', 10);
+                        finalSmashBtn.className = "interactive-target w-full py-3 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-title text-xl rounded-2xl border border-amber-300 shadow-xl flex items-center justify-center gap-3 btn-action cursor-pointer animate-pulse";
+                        finalSmashBtn.innerHTML = '<i class="fas fa-hammer text-2xl"></i><span>사슬 최종 파쇄하기!</span>';
+                    }
+                });
+            });
+            finalSmashBtn.addEventListener('click', () => {
+                if (!game.isRunning || !unlocked) return;
+                sfx.playCut();
+                svg.querySelectorAll('.chain8').forEach(c => c.classList.add('shatter'));
+                document.getElementById('lockG').style.display = 'none';
+                document.getElementById('armsUp').style.display = '';
+                document.getElementById('person').classList.add('cheer');
+                pop(svg, 200, 90, '#e2e8f0', 16);
+                stageComplete(1800);
+            });
+        }
+
+// ===== helpers for stages 9-17 =====
+        function face(cx, cy, r, mood) {
+            const s = r / 16;
+            const m = mood === 'happy'
+                ? `<path d="M${cx - 5 * s} ${cy + 8 * s} q${5 * s} ${6 * s} ${10 * s} 0" stroke="#7f1d1d" fill="none" stroke-width="2"/>`
+                : `<path d="M${cx - 5 * s} ${cy + 10 * s} q${5 * s} ${-4 * s} ${10 * s} 0" stroke="#7f1d1d" fill="none" stroke-width="2"/><path d="M${cx - 9 * s} ${cy - 6 * s} l${7 * s} ${-2 * s} M${cx + 9 * s} ${cy - 6 * s} l${-7 * s} ${-2 * s}" stroke="#451a03" stroke-width="1.8"/>`;
+            return `<circle data-head cx="${cx}" cy="${cy}" r="${r}" fill="#fcd9b6"/><path d="M${cx - r} ${cy - 3 * s} a${r} ${r * 0.9} 0 0 1 ${2 * r} 0 q${-r} ${-8 * s} ${-2 * r} 0z" fill="#451a03"/><circle cx="${cx - 5 * s}" cy="${cy + s}" r="2" fill="#111"/><circle cx="${cx + 5 * s}" cy="${cy + s}" r="2" fill="#111"/>${m}`;
+        }
+        function showProgress(label, hint) {
+            elements.progressContainer.classList.remove('hidden');
+            elements.progressLabel.textContent = label;
+            elements.keyHint.textContent = hint;
+        }
+        function actBtn(grad, icon, text) {
+            return `<button id="actBtn" class="interactive-target w-full py-3 bg-gradient-to-r ${grad} text-white font-title text-xl rounded-2xl border border-white/20 shadow-xl flex items-center justify-center gap-3 btn-action"><i class="fas ${icon} text-2xl"></i><span>${text}</span></button>`;
+        }
+        function sceneSvg(inner) { return `<svg id="scene" viewBox="0 0 400 190" class="w-full h-44 md:h-48 rounded-2xl">${inner}</svg>`; }
+        function wrapStage(inner) { return `<div class="flex flex-col items-center justify-between h-full w-full py-1 gap-1">${inner}</div>`; }
+        const HAMMER = `<path d="M0 0 L-42 -52" stroke="#92400e" stroke-width="7" stroke-linecap="round"/><rect x="-58" y="-60" width="32" height="16" rx="3" transform="rotate(-39 -42 -52)" fill="#64748b" stroke="#334155"/>`;
+
+        // STAGE 9: Frozen in ice - smash it with a hammer
+        function setupStage9() {
+            showProgress("얼음 파쇄 진행도", "💡 망치로 얼음을 60번 내리쳐 깨뜨리세요! (클릭 / 스페이스바)");
+            game.stageTarget = 60; game.stageProgress = 0;
+            const cp = ['M200 40 L190 70 L205 90 L192 120', 'M170 60 L190 70 L160 100', 'M230 70 L205 90 L240 118', 'M150 120 L180 110 L192 120 L170 150', 'M250 130 L225 112 L240 118 L225 150', 'M205 90 L215 130 L200 160'];
+            const cracks = cp.map(d => `<path class="crack" d="${d}" stroke="#f0f9ff" stroke-width="2.5" fill="none" style="opacity:0"/>`).join('');
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#bae6fd"/><rect y="160" width="400" height="30" fill="#f8fafc"/>
+                <g id="person">
+                    <rect x="184" y="150" width="12" height="22" fill="#1e3a8a"/><rect x="204" y="150" width="12" height="22" fill="#1e3a8a"/>
+                    <rect x="180" y="84" width="40" height="70" rx="12" fill="#3b82f6"/>
+                    <path d="M180 90 Q160 100 176 118 M220 90 Q240 100 224 118" stroke="#fcd9b6" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    ${face(200, 66, 16, 'scared')}
+                    <path d="M184 82 q16 12 32 0" stroke="#ef4444" stroke-width="7" fill="none"/>
+                </g>
+                <g id="ice" class="fb"><rect x="140" y="30" width="120" height="140" rx="14" fill="#7dd3fc" fill-opacity=".42" stroke="#e0f2fe" stroke-width="3"/><path d="M152 44 V100 M246 50 V80" stroke="#fff" stroke-opacity=".7" stroke-width="4" stroke-linecap="round"/>${cracks}</g>
+                <g transform="translate(330,150)"><g id="ham" class="ham">${HAMMER}</g></g>`) + actBtn('from-sky-600 to-blue-700', 'fa-hammer', '얼음 깨기 (0 / 60)'));
+            const btn = document.getElementById('actBtn'), svg = document.getElementById('scene'), cr = [...svg.querySelectorAll('.crack')];
+            btn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playCut(); game.stageProgress++;
+                const p = game.stageProgress / 60;
+                updateProgressBar(p * 100);
+                btn.querySelector('span').textContent = `얼음 깨기 (${game.stageProgress} / 60)`;
+                restart(document.getElementById('ham'), 'hamHit');
+                pop(svg, 262, 112, '#e0f2fe', 4);
+                cr.forEach((c, i) => c.style.opacity = Math.min(1, Math.max(0, p * cr.length - i)));
+                if (game.stageProgress % 4 === 0) shakeStage();
+                if (game.stageProgress >= 60) {
+                    document.getElementById('ice').classList.add('iceOut');
+                    pop(svg, 200, 100, '#e0f2fe', 20);
+                    document.getElementById('person').classList.add('cheer');
+                    stageComplete(1800);
+                }
+            });
+        }
+
+        // STAGE 10: Tied to a pole - untie the knot of the requested colour
+        function setupStage10() {
+            showProgress("매듭 풀기 진행도", "💡 위에 표시된 색의 매듭을 찾아 2번씩 눌러 풀어주세요! (틀린 매듭은 흔들리기만 해요)");
+            const cols = [['빨강', '#ef4444'], ['파랑', '#3b82f6'], ['노랑', '#facc15'], ['초록', '#22c55e'], ['보라', '#a855f7']];
+            const ys = [74, 92, 110, 128, 146];
+            const order = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+            let idx = 0, pulls = 0, bands = '';
+            ys.forEach((y, i) => bands += `<g class="band fb" data-i="${i}"><rect x="174" y="${y - 4}" width="52" height="9" rx="4" fill="#a16207" stroke="#451a03"/><g class="knot" data-i="${i}" style="cursor:pointer"><circle cx="232" cy="${y}" r="9" fill="${cols[i][1]}" stroke="#fff" stroke-width="2"/><path d="M226 ${y} l-6 8 M238 ${y} l7 8" stroke="${cols[i][1]}" stroke-width="3" stroke-linecap="round"/><circle cx="232" cy="${y}" r="15" fill="transparent"/></g></g>`);
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#fed7aa"/><rect y="168" width="400" height="22" fill="#a16207"/>
+                <rect x="176" y="8" width="48" height="162" fill="#78350f"/>
+                <rect x="186" y="150" width="12" height="20" fill="#1e3a8a"/><rect x="202" y="150" width="12" height="20" fill="#1e3a8a"/>
+                <rect x="184" y="64" width="32" height="90" rx="10" fill="#f97316"/>
+                <g id="head">${face(200, 46, 15, 'scared')}</g>
+                <g id="armsUp" style="display:none"><path d="M184 70 Q164 58 168 32 M216 70 Q236 58 232 32" stroke="#fcd9b6" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+                <g id="person" class="fb">${bands}</g>
+                <g transform="translate(10,12)"><rect width="156" height="30" rx="8" fill="#0f172a" stroke="#fbbf24"/><circle id="goalDot" cx="16" cy="15" r="7"/><text id="goalTxt" x="30" y="19" font-size="12" font-weight="bold" fill="#fde68a"></text></g>`));
+            const svg = document.getElementById('scene');
+            function setGoal() { const c = cols[order[idx]]; document.getElementById('goalDot').setAttribute('fill', c[1]); document.getElementById('goalTxt').textContent = `${c[0]} 매듭을 풀어라`; }
+            setGoal();
+            svg.querySelectorAll('.knot').forEach(k => k.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                const i = +k.dataset.i;
+                if (i !== order[idx]) { sfx.playClick(); shakeStage(); return; }
+                sfx.playCut(); pulls++; pop(svg, 232, ys[i], cols[i][1], 5);
+                if (pulls >= 2) {
+                    svg.querySelector(`.band[data-i="${i}"]`).classList.add('fallT');
+                    idx++; pulls = 0; updateProgressBar(idx / 5 * 100);
+                    if (idx >= 5) {
+                        document.getElementById('armsUp').style.display = '';
+                        document.getElementById('head').classList.add('cheer');
+                        stageComplete(1700);
+                    } else setGoal();
+                } else updateProgressBar((idx + 0.5) / 5 * 100);
+            }));
+        }
+
+        // STAGE 11: Pinned under a boulder - choose a fulcrum, then press the lever
+        function setupStage11() {
+            showProgress("바위 들어올리기", "💡 먼저 받침돌 위치를 고르세요 (바위에 가까울수록 쉬워요)! 그다음 지렛대를 눌러 바위를 들어올리세요!");
+            const spots = [{ x: 70, n: 60 }, { x: 105, n: 48 }, { x: 140, n: 38 }, { x: 175, n: 30 }, { x: 205, n: 22 }];
+            let chosen = -1; game.stageTarget = 0; game.stageProgress = 0;
+            let sp = ''; spots.forEach((s, i) => sp += `<g class="spot" data-i="${i}" style="cursor:pointer"><circle cx="${s.x}" cy="156" r="10" fill="none" stroke="#fde047" stroke-width="2.5" stroke-dasharray="4 3"/><text x="${s.x}" y="160" font-size="11" fill="#fde047" text-anchor="middle" font-weight="bold">?</text><circle cx="${s.x}" cy="156" r="15" fill="transparent"/></g>`);
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#fde68a"/><rect y="150" width="400" height="40" fill="#a16207"/>
+                <g id="plank"><rect x="40" y="140" width="215" height="10" rx="2" fill="#b45309" stroke="#451a03"/></g>
+                <path id="stone" d="M-14 0 L0 -22 L14 0Z" fill="#a8a29e" stroke="#44403c" stroke-width="2" style="display:none"/>
+                <g id="person">
+                    <rect x="262" y="136" width="66" height="14" rx="6" fill="#1e3a8a"/><rect x="326" y="128" width="36" height="22" rx="8" fill="#f97316"/>
+                    <path d="M340 130 q8 -24 24 -26 M350 132 q10 -22 26 -22" stroke="#fcd9b6" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    ${face(374, 138, 13, 'scared')}
+                </g>
+                <g id="rock"><path d="M232 150 Q226 90 262 72 Q300 62 322 92 Q336 130 318 150Z" fill="#78716c" stroke="#44403c" stroke-width="3"/><path d="M252 100 Q270 84 292 88 M270 120 l18 -8" stroke="#a8a29e" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+                ${sp}`) + actBtn('from-stone-600 to-amber-700', 'fa-up-long', '받침돌 위치를 고르세요'));
+            const btn = document.getElementById('actBtn'), svg = document.getElementById('scene');
+            btn.disabled = true;
+            svg.querySelectorAll('.spot').forEach(g => g.addEventListener('click', () => {
+                if (!game.isRunning || chosen >= 0) return;
+                chosen = +g.dataset.i; const s = spots[chosen]; game.stageTarget = s.n;
+                svg.querySelectorAll('.spot').forEach(e => e.style.display = 'none');
+                const st = document.getElementById('stone'); st.setAttribute('transform', `translate(${s.x},150)`); st.style.display = '';
+                document.getElementById('plank').style.transformOrigin = `${s.x}px 150px`;
+                btn.disabled = false; btn.querySelector('span').textContent = `지렛대 누르기 (0 / ${s.n})`;
+                sfx.playClick();
+            }));
+            btn.addEventListener('click', () => {
+                if (!game.isRunning || chosen < 0) return;
+                sfx.playClick(); game.stageProgress++;
+                const p = Math.min(1, game.stageProgress / game.stageTarget);
+                updateProgressBar(p * 100);
+                btn.querySelector('span').textContent = `지렛대 누르기 (${game.stageProgress} / ${game.stageTarget})`;
+                document.getElementById('plank').style.transform = `rotate(${-p * 14}deg)`;
+                document.getElementById('rock').style.transform = `translateY(${-p * 46}px)`;
+                pop(svg, spots[chosen].x, 146, '#fde047', 2);
+                if (p >= 1) {
+                    document.getElementById('person').style.transition = 'transform .8s'; document.getElementById('person').style.transform = 'translateX(14px)';
+                    document.getElementById('rock').style.transform = 'translateY(-60px) rotate(-8deg)';
+                    document.getElementById('person').classList.add('cheer');
+                    pop(svg, 300, 100, '#fde047', 12); stageComplete(1800);
+                }
+            });
+        }
+
+        // STAGE 12: Sinking in a swamp - grab the rope with perfect timing
+        function setupStage12() {
+            showProgress("구출 진행도", "💡 구명줄이 흔들려 초록 구간에 들어올 때 '잡기!'를 누르세요! (스페이스바 가능)");
+            let meter = 0, zoneW = 64, zoneX = 150, t = 0, pos = 0;
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#bae6fd"/>
+                <rect x="346" y="6" width="22" height="120" fill="#78350f"/><path d="M346 30 Q300 26 270 34" stroke="#78350f" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <circle cx="357" cy="8" r="26" fill="#15803d"/><circle cx="290" cy="22" r="18" fill="#166534"/>
+                <g id="pg"><rect x="-14" y="16" width="28" height="60" rx="8" fill="#3b82f6"/>
+                    <path d="M-14 24 Q-30 10 -22 -12 M14 24 Q30 10 22 -12" stroke="#fcd9b6" stroke-width="7" fill="none" stroke-linecap="round"/>${face(0, 0, 16, 'scared')}</g>
+                <rect y="118" width="400" height="72" fill="#7c4a1e"/><ellipse cx="200" cy="118" rx="200" ry="5" fill="#a16207"/>
+                <circle cx="60" cy="140" r="5" fill="#a16207" opacity=".7"/><circle cx="320" cy="150" r="7" fill="#a16207" opacity=".7"/><circle cx="110" cy="165" r="4" fill="#a16207" opacity=".7"/>
+                <path id="rope" d="" stroke="#d97706" stroke-width="5" fill="none" stroke-dasharray="6 3" stroke-linecap="round"/>
+                <rect x="40" y="166" width="320" height="14" rx="7" fill="#1e293b"/>
+                <rect id="zone" x="150" y="166" width="64" height="14" rx="4" fill="#22c55e"/>
+                <rect id="mk" x="40" y="162" width="6" height="22" rx="2" fill="#fff" stroke="#0f172a"/>`) + actBtn('from-emerald-600 to-teal-700', 'fa-hand-back-fist', '구명줄 잡기!'));
+            const svg = document.getElementById('scene'), zone = document.getElementById('zone'), mk = document.getElementById('mk');
+            function render() {
+                const hy = 96 - meter * 0.56;
+                document.getElementById('pg').setAttribute('transform', `translate(200,${hy})`);
+                document.getElementById('rope').setAttribute('d', `M332 34 Q290 ${hy + 30} 222 ${hy - 10}`);
+                updateProgressBar(meter);
+            }
+            render();
+            game.tick = dt => { t += dt; pos = 0.5 + 0.5 * Math.sin(t * 3.4); mk.setAttribute('x', 40 + pos * 314); };
+            document.getElementById('actBtn').addEventListener('click', () => {
+                if (!game.isRunning) return;
+                const c = 40 + pos * 314 + 3;
+                if (c >= zoneX && c <= zoneX + zoneW) {
+                    sfx.playCut(); meter = Math.min(100, meter + 17); zoneW = Math.max(36, zoneW - 5);
+                    zoneX = 46 + Math.random() * (308 - zoneW);
+                    zone.setAttribute('x', zoneX); zone.setAttribute('width', zoneW);
+                    pop(svg, 222, 96 - meter * 0.56, '#bbf7d0', 6);
+                    render();
+                    if (meter >= 100) { document.getElementById('pg').classList.add('cheer'); game.tick = null; stageComplete(1600); }
+                } else { sfx.playClick(); meter = Math.max(0, meter - 12); shakeStage(); render(); }
+            });
+        }
+
+        // STAGE 13: Trapped in a car - cut the seat belt, then break the window
+        function setupStage13() {
+            showProgress("탈출 진행도", "💡 ① 안전벨트를 자른 뒤 ② 비상 망치로 창문을 깨세요! (클릭 / 스페이스바)");
+            game.stageTarget = 50; game.stageProgress = 0;
+            const cp = ['M262 98 L240 80 L214 74', 'M262 98 L252 70 L246 66', 'M262 98 L224 96 L196 90', 'M262 98 L270 78 L282 70', 'M262 98 L236 104'];
+            const cracks = cp.map(d => `<path class="crack" d="${d}" stroke="#f0f9ff" stroke-width="2.5" fill="none" style="opacity:0"/>`).join('');
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#334155"/><rect y="152" width="400" height="38" fill="#1e293b"/>
+                <path d="M60 150 V118 Q60 106 74 104 L110 100 L134 62 Q140 54 150 54 H262 Q272 54 278 62 L304 100 L336 106 Q346 108 346 120 V150Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="3"/>
+                <path d="M138 66 H266 L286 98 H120Z" fill="#0f172a"/>
+                <g id="person"><rect x="182" y="90" width="34" height="10" fill="#3b82f6"/>${face(200, 80, 13, 'scared')}</g>
+                <path id="belt" d="M222 66 L190 98" stroke="#111827" stroke-width="7" class="fb"/><rect x="186" y="90" width="9" height="8" fill="#94a3b8"/>
+                <g id="glass" class="fb"><path d="M138 66 H266 L286 98 H120Z" fill="#bae6fd" fill-opacity=".35" stroke="#e0f2fe" stroke-width="2"/>${cracks}</g>
+                <circle cx="110" cy="152" r="20" fill="#111827"/><circle cx="110" cy="152" r="8" fill="#64748b"/><circle cx="300" cy="152" r="20" fill="#111827"/><circle cx="300" cy="152" r="8" fill="#64748b"/>
+                <g transform="translate(236,84) scale(-1,1)"><g id="cutter">${CUTTER}</g></g>
+                <g transform="translate(330,140)" id="hamWrap" style="display:none"><g id="ham" class="ham">${HAMMER}</g></g>`) + actBtn('from-red-600 to-orange-700', 'fa-scissors', '안전벨트 자르기 (0 / 20)'));
+            const btn = document.getElementById('actBtn'), svg = document.getElementById('scene'), cr = [...svg.querySelectorAll('.crack')];
+            btn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                game.stageProgress++;
+                const n = game.stageProgress;
+                updateProgressBar(n / 50 * 100);
+                if (n <= 20) {
+                    sfx.playCut(); restart(document.getElementById('cutter'), 'snip'); pop(svg, 206, 82, '#fde047', 3);
+                    document.getElementById('belt').setAttribute('stroke-width', 7 - 5.5 * n / 20);
+                    btn.querySelector('span').textContent = `안전벨트 자르기 (${n} / 20)`;
+                    if (n === 20) {
+                        document.getElementById('belt').classList.add('fallB'); document.getElementById('cutter').style.display = 'none';
+                        document.getElementById('hamWrap').style.display = '';
+                        btn.querySelector('span').textContent = '창문 깨기 (0 / 30)'; btn.querySelector('i').className = 'fas fa-hammer text-2xl';
+                    }
+                } else {
+                    const k = n - 20, p = k / 30;
+                    sfx.playMetalSaw(); restart(document.getElementById('ham'), 'hamHit'); pop(svg, 272, 100, '#e0f2fe', 4);
+                    btn.querySelector('span').textContent = `창문 깨기 (${k} / 30)`;
+                    cr.forEach((c, i) => c.style.opacity = Math.min(1, Math.max(0, p * cr.length - i)));
+                    if (k % 4 === 0) shakeStage();
+                    if (n >= 50) {
+                        document.getElementById('glass').classList.add('fallB'); pop(svg, 200, 84, '#e0f2fe', 20);
+                        document.getElementById('hamWrap').style.display = 'none';
+                        setTimeout(() => document.getElementById('person').classList.add('carOut'), 300);
+                        stageComplete(2000);
+                    }
+                }
+            });
+        }
+
+        // STAGE 14: Dolphin tangled in a fishing net - cut only the taut (red) strands
+        function setupStage14() {
+            showProgress("그물 제거 진행도", "💡 빨갛게 팽팽한 줄을 가위로 2번씩 눌러 자르세요! 느슨한 줄을 자르면 더 조여져요!");
+            const L = [[60, 36, 330, 150], [330, 36, 60, 150], [130, 30, 160, 176], [240, 30, 255, 176], [40, 104, 360, 124], [90, 60, 300, 170], [310, 48, 110, 176], [50, 150, 340, 62]];
+            const taut = new Set(); while (taut.size < 4) taut.add(Math.floor(Math.random() * 8));
+            const cuts = L.map(() => 0);
+            const strands = L.map((l, i) => `<g class="strand" data-i="${i}" style="cursor:pointer"><line class="vis" x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}"/><line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="transparent" stroke-width="18"/></g>`).join('');
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#0369a1"/><rect y="150" width="400" height="40" fill="#075985"/>
+                <g id="dol">
+                    <path d="M268 100 L312 72 L300 108 L318 140 L266 114Z" fill="#475569"/>
+                    <path d="M180 78 L205 46 L224 80Z" fill="#475569"/>
+                    <ellipse cx="190" cy="105" rx="85" ry="32" fill="#64748b"/><ellipse cx="190" cy="118" rx="70" ry="16" fill="#cbd5e1"/>
+                    <path d="M92 108 L52 112 Q50 120 62 122 L96 122Z" fill="#64748b"/>
+                    <circle data-head cx="112" cy="100" r="26" fill="#64748b"/>
+                    <circle cx="104" cy="94" r="4" fill="#fff"/><circle cx="105" cy="95" r="2" fill="#111"/><path d="M92 114 q10 6 24 0" stroke="#0f172a" stroke-width="2" fill="none"/>
+                </g>
+                <g id="net" stroke-linecap="round">${strands}</g>
+                <g id="scisWrap" transform="translate(0,0)" style="display:none"><g id="scis2">${SCISSORS}</g></g>`));
+            const svg = document.getElementById('scene');
+            function paint() {
+                svg.querySelectorAll('.strand').forEach(g => {
+                    const i = +g.dataset.i, v = g.querySelector('.vis');
+                    if (cuts[i] >= 2 && taut.has(i)) { g.style.display = 'none'; return; }
+                    v.setAttribute('stroke', taut.has(i) ? '#ef4444' : '#d6d3d1');
+                    v.setAttribute('stroke-width', taut.has(i) ? (cuts[i] ? 3 : 5) : 3);
+                    v.setAttribute('stroke-dasharray', taut.has(i) ? '' : '8 4');
+                });
+                let done = 0, total = 0; taut.forEach(i => { done += Math.min(2, cuts[i]); total += 2; });
+                updateProgressBar(done / total * 100);
+                return done >= total;
+            }
+            paint();
+            svg.querySelectorAll('.strand').forEach(g => g.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                const i = +g.dataset.i, l = L[i];
+                if (taut.has(i)) {
+                    if (cuts[i] >= 2) return;
+                    cuts[i]++; sfx.playCut();
+                    const mx = (l[0] + l[2]) / 2, my = (l[1] + l[3]) / 2;
+                    document.getElementById('scisWrap').style.display = '';
+                    document.getElementById('scisWrap').setAttribute('transform', `translate(${mx},${my - 42})`);
+                    restart(document.getElementById('scis2'), 'snip'); pop(svg, mx, my, '#fde047', 4);
+                } else {
+                    sfx.playClick(); shakeStage(); taut.add(i);
+                }
+                if (paint()) {
+                    document.getElementById('net').style.transition = 'transform .8s, opacity .8s';
+                    document.getElementById('net').style.transform = 'translateY(70px)'; document.getElementById('net').style.opacity = 0;
+                    document.getElementById('scisWrap').style.display = 'none';
+                    document.getElementById('dol').classList.add('dolJump');
+                    hearts(svg, 120, 80); stageComplete(2200);
+                }
+            }));
+        }
+
+        // STAGE 15: Locked container - pick the lock (click each pin when it is on the shear line)
+        function setupStage15() {
+            showProgress("자물쇠 핀 해제", "💡 핀이 초록 구간(전단선)에 올라온 순간 핀을 클릭해 고정하세요! 5개 모두!");
+            const xs = [170, 212, 254, 296, 338], sp = [1.9, 2.4, 2.0, 2.8, 2.3], ph = xs.map(() => Math.random() * 6.28);
+            const set = xs.map(() => false); let count = 0, t = 0;
+            const pins = xs.map((x, i) => `<g class="pin" data-i="${i}" style="cursor:pointer"><rect x="${x - 13}" y="36" width="26" height="112" rx="4" fill="#0f172a" stroke="#475569"/><rect class="pr" x="${x - 9}" y="76" width="18" height="26" rx="3" fill="#f59e0b" stroke="#92400e"/><rect x="${x - 13}" y="36" width="26" height="112" fill="transparent"/></g>`).join('');
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#1e293b"/>
+                <g id="cont"><rect x="10" y="40" width="108" height="112" rx="6" fill="#b91c1c" stroke="#7f1d1d" stroke-width="3"/><path d="M26 44 V148 M46 44 V148 M66 44 V148 M86 44 V148 M106 44 V148" stroke="#991b1b" stroke-width="4"/>
+                    <circle cx="64" cy="84" r="24" fill="#0f172a" stroke="#fca5a5" stroke-width="4"/><g id="faceG">${face(64, 86, 15, 'scared')}</g></g>
+                <path id="shackle" class="fb" d="M160 34 V28 a20 20 0 0 1 40 0 V34" stroke="#e5e7eb" stroke-width="8" fill="none" stroke-linecap="round" style="transition:transform .5s"/>
+                <rect x="150" y="30" width="230" height="124" rx="12" fill="#f59e0b" stroke="#92400e" stroke-width="3"/>
+                <rect x="156" y="76" width="218" height="26" fill="#22c55e" fill-opacity=".28" stroke="#22c55e" stroke-dasharray="5 3"/>
+                ${pins}
+                <g id="pickPos" transform="translate(170,190)"><g id="pick"><path d="M0 0 V-34 q0 -8 6 -8" stroke="#cbd5e1" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="-5" y="-4" width="10" height="26" rx="4" fill="#111827"/></g></g>`));
+            const svg = document.getElementById('scene'), prs = [...svg.querySelectorAll('.pr')];
+            game.tick = dt => { t += dt; xs.forEach((x, i) => { if (!set[i]) prs[i].setAttribute('y', 89 - 13 + 34 * Math.sin(t * sp[i] + ph[i])); }); };
+            svg.querySelectorAll('.pin').forEach(g => g.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                const i = +g.dataset.i; if (set[i]) return;
+                document.getElementById('pickPos').setAttribute('transform', `translate(${xs[i]},190)`);
+                document.getElementById('pick').animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-40px)' }, { transform: 'translateY(0)' }], { duration: 180 });
+                const cy = +prs[i].getAttribute('y') + 13;
+                if (Math.abs(cy - 89) <= 12) {
+                    set[i] = true; count++; prs[i].setAttribute('y', 76); prs[i].setAttribute('fill', '#22c55e'); sfx.playCut();
+                    pop(svg, xs[i], 89, '#bbf7d0', 5); updateProgressBar(count / 5 * 100);
+                    if (count >= 5) {
+                        game.tick = null;
+                        document.getElementById('shackle').style.transform = 'translateY(-14px) rotate(-30deg)';
+                        document.getElementById('faceG').innerHTML = face(64, 86, 15, 'happy');
+                        document.getElementById('cont').classList.add('cheer'); pop(svg, 260, 60, '#fde047', 16); stageComplete(1800);
+                    }
+                } else { sfx.playClick(); shakeStage(); }
+            }));
+        }
+
+        // STAGE 16: Boat tied to the dock - untie the rope, then pull the engine starter cord
+        function setupStage16() {
+            showProgress("출항 진행도", "💡 ① 닻줄 매듭을 풀고 ② 시동 줄을 연타해서 엔진 게이지를 가득 채우세요! (클릭 / 스페이스바)");
+            let step = 1, k = 0, gauge = 0; const K = 30; game.stageProgress = 0;
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#bae6fd"/><rect y="118" width="400" height="72" fill="#0369a1"/><path d="M0 124 q25 -8 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+                <rect x="0" y="100" width="76" height="10" fill="#a16207"/><rect x="12" y="110" width="14" height="80" fill="#78350f"/><rect x="52" y="110" width="14" height="80" fill="#78350f"/>
+                <rect x="58" y="86" width="10" height="14" rx="3" fill="#475569"/>
+                <g id="boat"><path d="M120 112 H300 Q290 150 255 152 H150 Q125 140 120 112Z" fill="#f8fafc" stroke="#1e3a8a" stroke-width="3"/><rect x="124" y="120" width="170" height="8" fill="#ef4444"/>
+                    <rect x="176" y="92" width="56" height="22" rx="4" fill="#93c5fd" stroke="#1e3a8a" stroke-width="2"/>
+                    <rect x="142" y="98" width="16" height="16" rx="4" fill="#3b82f6"/>${face(150, 86, 12, 'scared')}
+                    <rect x="298" y="104" width="18" height="38" rx="4" fill="#1f2937"/><path d="M300 142 l-8 12 l22 0z" fill="#475569"/>
+                    <g id="cordG"><path d="M308 106 L332 82" stroke="#e5e7eb" stroke-width="2.5"/><circle id="handle" cx="334" cy="80" r="6" fill="#dc2626"/></g></g>
+                <g id="ropeG"><path id="rope" d="M64 92 Q96 116 128 114" stroke="#b45309" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M64 92 Q96 116 128 114" stroke="#fcd34d" stroke-width="7" fill="none" stroke-dasharray="3 5" opacity=".6"/><circle cx="64" cy="92" r="7" fill="#92400e" stroke="#451a03" stroke-width="2"/></g>
+                <text x="258" y="22" font-size="10" fill="#0c4a6e" font-weight="bold">엔진 RPM</text><rect x="258" y="26" width="130" height="10" rx="5" fill="#1e293b"/><rect id="gaugeBar" x="258" y="26" width="0" height="10" rx="5" fill="#22c55e"/>`) + actBtn('from-sky-600 to-indigo-700', 'fa-rope-knot', '닻줄 풀기 (0 / 30)'));
+            const btn = document.getElementById('actBtn'), svg = document.getElementById('scene');
+            function renderGauge() { document.getElementById('gaugeBar').setAttribute('width', 130 * gauge / 100); updateProgressBar(50 + gauge / 2); }
+            game.tick = dt => { if (step === 2 && gauge > 0) { gauge = Math.max(0, gauge - 18 * dt); renderGauge(); } };
+            btn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                if (step === 1) {
+                    sfx.playCut(); k++; document.getElementById('rope').setAttribute('stroke-width', 9 - 8 * k / K);
+                    pop(svg, 64, 92, '#fcd34d', 3); updateProgressBar(k / K * 50);
+                    btn.querySelector('span').textContent = `닻줄 풀기 (${k} / ${K})`;
+                    if (k >= K) { document.getElementById('ropeG').classList.add('fallB'); step = 2; btn.querySelector('span').textContent = '시동 줄 당기기!'; btn.querySelector('i').className = 'fas fa-bolt text-2xl'; }
+                } else {
+                    sfx.playMetalSaw(); gauge = Math.min(100, gauge + 5); restart(document.getElementById('cordG'), 'pullCord'); renderGauge();
+                    pop(svg, 306, 150, '#cbd5e1', 2);
+                    if (gauge >= 100) { game.tick = null; document.getElementById('boat').classList.add('boatGo'); pop(svg, 306, 150, '#fff', 12); stageComplete(2400); }
+                }
+            });
+        }
+
+        // STAGE 17(hinge): Locked door - unscrew the four hinges
+        function setupStage17() {
+            showProgress("경첩 분해 진행도", "💡 드라이버로 경첩 나사 4개를 풀어 문을 떼어내세요! (클릭 / 스페이스바)");
+            game.stageTarget = 80; game.stageProgress = 0;
+            const ys = [36, 78, 120, 162]; let screws = '';
+            ys.forEach((y, i) => screws += `<rect x="62" y="${y - 14}" width="28" height="28" rx="3" fill="#64748b" stroke="#334155"/><g id="sc${i}"><circle cx="76" cy="${y}" r="8" fill="#cbd5e1" stroke="#475569" stroke-width="2"/><path d="M69 ${y} H83" stroke="#475569" stroke-width="3"/></g>`);
+            elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
+                <rect width="400" height="190" fill="#1e293b"/><rect x="256" y="14" width="130" height="162" fill="#0f172a"/>
+                <g id="room"><rect x="70" y="14" width="170" height="162" fill="#0b1220"/>
+                    <g id="pers"><rect x="132" y="86" width="36" height="76" rx="10" fill="#f97316"/><path d="M134 92 L112 82 M166 92 L188 82" stroke="#fcd9b6" stroke-width="8" stroke-linecap="round"/>${face(150, 64, 16, 'scared')}</g></g>
+                <g id="door"><path fill-rule="evenodd" d="M70 14 H240 V176 H70Z M118 34 H182 V92 H118Z" fill="#a16207" stroke="#451a03" stroke-width="3"/>
+                    <path d="M70 110 H240 M70 150 H240" stroke="#78350f" stroke-width="2"/><path d="M130 34 V92 M150 34 V92 M170 34 V92" stroke="#94a3b8" stroke-width="4"/>
+                    <circle cx="222" cy="100" r="7" fill="#fbbf24"/>${screws}</g>
+                <g id="drvPos" transform="translate(76,36)"><g id="drv"><rect x="8" y="-3" width="62" height="6" fill="#94a3b8"/><rect x="70" y="-8" width="34" height="16" rx="6" fill="#facc15" stroke="#a16207"/></g></g>`) + actBtn('from-slate-600 to-zinc-700', 'fa-screwdriver', '나사 풀기 (0 / 80)'));
+            const btn = document.getElementById('actBtn'), svg = document.getElementById('scene');
+            btn.addEventListener('click', () => {
+                if (!game.isRunning) return;
+                sfx.playMetalSaw(); game.stageProgress++;
+                const n = game.stageProgress, i = Math.min(3, Math.floor((n - 1) / 20));
+                updateProgressBar(n / 80 * 100);
+                btn.querySelector('span').textContent = `나사 풀기 (${n} / 80)`;
+                restart(document.getElementById('drv'), 'wig');
+                const sc = document.getElementById('sc' + i); sc.style.transformOrigin = `76px ${ys[i]}px`; sc.style.transform = `rotate(${(n % 20) * 45}deg)`;
+                if (n % 20 === 0) {
+                    pop(svg, 76, ys[i], '#e2e8f0', 6);
+                    sc.animate([{ opacity: 1 }, { transform: 'translate(-24px,70px)', opacity: 0 }], { duration: 500, fill: 'forwards' });
+                    if (i < 3) document.getElementById('drvPos').setAttribute('transform', `translate(76,${ys[i + 1]})`);
+                }
+                if (n >= 80) {
+                    document.getElementById('drvPos').style.display = 'none';
+                    const d = document.getElementById('door'); d.style.transformOrigin = '70px 176px'; d.style.transition = 'transform .9s ease-in, opacity .9s'; d.style.transform = 'rotate(-22deg) translate(-40px,80px)'; d.style.opacity = 0;
+                    document.getElementById('room').querySelector('rect').setAttribute('fill', '#fde68a');
+                    document.getElementById('pers').classList.add('cheer'); stageComplete(2000);
+                }
+            });
+        }
+
+        /* ==========================================================================
+           6. INITIALIZATION ENTRY POINT
+           ========================================================================== */
+        window.onload = function() {
+            initGameEvents();
+        };
+    </script>
+</body>
+</html>

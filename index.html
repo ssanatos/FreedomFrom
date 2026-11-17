@@ -1159,19 +1159,20 @@
             const SLIP = 5;     // constant slipping down (%/s)
             const GRAV = 55;    // extra falling acceleration while not jumping
             const KICK = 14;    // how much each kick cancels the falling speed
-            const WALL = { '-1': 78, '1': 322 };
+            const WALL = { '-1': 146, '1': 254 };   // narrower pit: the two walls are close together
             game.stageData = { h: 0 };
+            let trailT = 0;
             let h = 0, fallV = 0, side = -1, x = WALL['-1'], from = x, to = x, tt = 1, landed = true;
             let flow = '';
-            [14, 36, 58, 342, 364, 386].forEach((px, i) => flow += `<path class="mudflow" style="animation-delay:-${i * 0.15}s" d="M${px} 40 V186" stroke="#7c4a1e" stroke-width="3"/>`);
+            [16, 46, 76, 106, 294, 324, 354, 384].forEach((px, i) => flow += `<path class="mudflow" style="animation-delay:-${i * 0.15}s" d="M${px} 40 V186" stroke="#7c4a1e" stroke-width="3"/>`);
 
             elements.stageContainer.innerHTML = wrapStage(sceneSvg(`
                 <rect width="400" height="190" fill="#7dd3fc"/><circle cx="200" cy="-6" r="26" fill="#fde047"/>
                 <rect y="40" width="400" height="150" fill="#3f2a14"/>
-                <rect width="70" y="30" height="160" fill="#78350f"/><rect x="330" y="30" width="70" height="160" fill="#78350f"/>
-                <rect width="70" y="22" height="14" fill="#4d7c0f"/><rect x="330" y="22" width="70" height="14" fill="#4d7c0f"/>
+                <rect width="130" y="30" height="160" fill="#78350f"/><rect x="270" y="30" width="130" height="160" fill="#78350f"/>
+                <rect width="130" y="22" height="14" fill="#4d7c0f"/><rect x="270" y="22" width="130" height="14" fill="#4d7c0f"/>
                 ${flow}
-                <path d="M70 30 V190 M330 30 V190" stroke="#a16207" stroke-width="3" opacity=".6"/>
+                <path d="M130 30 V190 M270 30 V190" stroke="#a16207" stroke-width="3" opacity=".6"/>
                 <text x="200" y="30" font-size="10" fill="#0c4a6e" text-anchor="middle" font-weight="bold">▲ 지상 (탈출구)</text>
                 <g id="cl" transform="translate(78,168)"><g id="cb">
                     <path d="M-2 -24 L-14 -10 L-12 -2 M4 -24 L10 -8 L6 0" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -1194,20 +1195,28 @@
                 h = Math.max(0, h - (SLIP + fallV) * dt);
                 let hop = 0;
                 if (tt < 1) {
-                    tt = Math.min(1, tt + dt / 0.16);
-                    const e = tt < 0.5 ? 2 * tt * tt : 1 - Math.pow(-2 * tt + 2, 2) / 2;
-                    x = from + (to - from) * e; hop = 12 * Math.sin(Math.PI * tt);
-                    cb.style.transform = 'rotate(-20deg)';
+                    tt = Math.min(1, tt + dt / 0.22);
+                    x = from + (to - from) * tt;                 // constant sideways speed...
+                    hop = 36 * 4 * tt * (1 - tt);                // ...plus an up-and-down parabola = a clear jump arc
+                    cb.style.transform = `rotate(${-28 + 56 * tt}deg)`;
+                    trailT += dt;
+                    if (trailT > 0.02) {
+                        trailT = 0;
+                        const c = document.createElementNS(SVGNS, 'circle');
+                        c.setAttribute('cx', x); c.setAttribute('cy', 168 - h * 1.28 - hop - 32); c.setAttribute('r', 4); c.setAttribute('fill', '#fde68a');
+                        svg.insertBefore(c, cl);
+                        c.animate([{ opacity: .85 }, { opacity: 0 }], { duration: 420 }).onfinish = () => c.remove();
+                    }
                 } else {
                     cb.style.transform = 'rotate(0deg)';
-                    if (!landed) { landed = true; pop(svg, to + (side === -1 ? -8 : 8), 168 - h * 1.28 - 12, '#a16207', 4); }
+                    if (!landed) { landed = true; pop(svg, side === -1 ? 130 : 270, 168 - h * 1.28 - 12, '#a16207', 4); }
                 }
                 render(hop);
             };
             document.getElementById('actBtn').addEventListener('click', () => {
                 if (!game.isRunning) return;
                 sfx.playClick();
-                pop(svg, side === -1 ? 70 : 330, 168 - h * 1.28 - 12, '#a16207', 3);
+                pop(svg, side === -1 ? 130 : 270, 168 - h * 1.28 - 12, '#a16207', 3);
                 side = -side; from = x; to = WALL[side]; tt = 0; landed = false;
                 h = Math.min(100, h + GAIN); fallV = Math.max(0, fallV - KICK);
                 if (h >= 100) {
